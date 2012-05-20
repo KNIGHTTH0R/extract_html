@@ -1,0 +1,25 @@
+<title>2012年江西省考面试成功系列精选活动专区_华图公务员考试网</title>
+<div class="school-listL650 float-L">
+    <div class="school-listL b1c">
+            <h1>2012年江西省考面试成功系列精选活动专区</h1>
+            <div class="laiyuan" align="center">
+            <div class="info">2012-05-15 15:12  作者：江西华图 来源：未知</div>
+      <!-- baidu Button BEGIN -->
+         <p class="title_height"></p>
+            <div id="ckepop" style=" float:right;">
+       <!-- Baidu Button BEGIN -->
+    <div id="bdshare" class="bdshare_t bds_tools get-codes-bdshare">
+        <span class="bds_more">分享到：</span>
+        <a class="bds_qzone"></a>
+        <a class="bds_tsina"></a>
+        <a class="bds_tqq"></a>
+        <a class="bds_renren"></a>
+		<a class="shareCount"></a>
+    </div>
+<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=518515" ></script>
+<script type="text/javascript" id="bdshell_js"></script>
+<script type="text/javascript">
+	document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?t=" + new Date().getHours();
+</script><!-- Baidu Button END -->      
+                
+            </div>  

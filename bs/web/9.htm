@@ -1,0 +1,706 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head profile="http://gmpg.org/xfn/11">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>梯度下降与神经网络 | 兰叶春葳蕤,桂华秋皎洁|大风堂</title> 
+<meta name="description" content="[caption id=&quot;&quot; align=&quot;aligncenter&quot; width=&quot;401&quot; caption=&quot;Neural Network&quot;][/caption]" />
+<meta name="keywords" content="gradient decent,neural network,梯度下降,神经网络" />
+<link rel="alternate" type="application/rss+xml" title="兰叶春葳蕤,桂华秋皎洁|大风堂 RSS Feed" href="http://www.zhenv5.com/?feed=rss2" />
+<link rel="alternate" type="application/atom+xml" title="兰叶春葳蕤,桂华秋皎洁|大风堂 Atom Feed" href="http://www.zhenv5.com/?feed=atom" />
+<link rel="pingback" href="http://www.zhenv5.com/xmlrpc.php" />
+<link rel="shortcut icon" href="http://www.zhenv5.com/wp-content/themes/weisaysimple/images/favicon.ico" type="image/x-icon" />
+<script type="text/javascript" src="http://www.zhenv5.com/wp-content/themes/weisaysimple/js/jquery.min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/combo?2.7.0/build/yahoo-dom-event/yahoo-dom-event.js&2.7.0/build/animation/animation-min.js"></script><link rel="stylesheet" type="text/css" href="http://www.zhenv5.com/wp-content/plugins/wp-to-top/css/wp-to-top.css" /><!--[if lte IE 6]><link rel="stylesheet" type="text/css" href="http://www.zhenv5.com/wp-content/plugins/wp-to-top/css/wp-to-topie6.css" /><![endif]--><link rel="alternate" type="application/rss+xml" title="兰叶春葳蕤,桂华秋皎洁|大风堂 &raquo; 梯度下降与神经网络 评论 Feed" href="http://www.zhenv5.com/?feed=rss2&#038;p=958" />
+<script type='text/javascript' src='http://www.zhenv5.com/wp-includes/js/prototype.js?ver=1.6.1'></script>
+<script type='text/javascript' src='http://www.zhenv5.com/wp-includes/js/scriptaculous/wp-scriptaculous.js?ver=1.8.3'></script>
+<script type='text/javascript' src='http://www.zhenv5.com/wp-includes/js/scriptaculous/effects.js?ver=1.8.3'></script>
+<script type='text/javascript' src='http://www.zhenv5.com/wp-content/plugins/lightbox-2/lightbox-resize.js?ver=1.8'></script>
+<script type='text/javascript' src='http://www.zhenv5.com/wp-content/plugins/wp-to-top/js/wp-to-top.js?ver=3.3.2'></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.zhenv5.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.zhenv5.com/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='MathType输入空格' href='http://www.zhenv5.com/?p=956' />
+<link rel='next' title='Win8初体验' href='http://www.zhenv5.com/?p=962' />
+<meta name="generator" content="WordPress 3.3.2" />
+<link rel='canonical' href='http://www.zhenv5.com/?p=958' />
+
+<!-- adman 1.6.7.1 -->
+
+	<!-- begin lightbox scripts -->
+	<script type="text/javascript">
+    //<![CDATA[
+    document.write('<link rel="stylesheet" href="http://www.zhenv5.com/wp-content/plugins/lightbox-2/Themes/Dark Grey/lightbox.css" type="text/css" media="screen" />');
+    //]]>
+    </script>
+	<!-- end lightbox scripts -->
+ 
+	<script type="text/javascript">
+	 //<![CDATA[ 
+	function toggleLinkGrp(id) {
+	   var e = document.getElementById(id);
+	   if(e.style.display == 'block')
+			e.style.display = 'none';
+	   else
+			e.style.display = 'block';
+	}
+	// ]]>
+	</script> 
+	<meta name='wumiiVerification' content='1aab91d8-72c4-4bda-b666-50a3079d58b1' />
+<link rel="stylesheet" type="text/css" href="http://www.zhenv5.com/wp-content/themes/weisaysimple/css/t-red.css" />
+<script type="text/javascript" src="http://www.zhenv5.com/wp-content/themes/weisaysimple/comments-ajax.js"></script>
+<script type="text/javascript" src="http://www.zhenv5.com/wp-content/themes/weisaysimple/js/realgravatar.js"></script>
+<script type="text/javascript" src="http://www.zhenv5.com/wp-content/themes/weisaysimple/js/hoveraccordion.js"></script>
+<script type="text/javascript" src="http://www.zhenv5.com/wp-content/themes/weisaysimple/js/weisay.js"></script>
+<script type="text/javascript">
+jQuery(document).ready(function($){
+$('.article h2 a').click(function(){
+    $(this).text('页面载入中……');
+    window.location = $(this).attr('href');
+    });
+});
+</script>
+<script type="text/javascript" src="http://www.zhenv5.com/wp-content/themes/weisaysimple/js/lazyload.js"></script>
+<script type="text/javascript">
+	$(function() {          
+    	$(".article img, .articles img").not("#respond_box img").lazyload({
+        	placeholder:"http://www.zhenv5.com/wp-content/themes/weisaysimple/images/image-pending.gif",
+            effect:"fadeIn"
+          });
+    	});
+</script></head>
+
+<body>
+<div id="page">
+<div id="header">
+<div id="top">
+<div id="top_logo">
+			<div class="clear"></div>
+                <a href="http://www.zhenv5.com" title="兰叶春葳蕤,桂华秋皎洁|大风堂 - 为梦想创造可能|真威武"><div class="logo"></div></a>
+    			</div>
+		<div class="search">		
+			<form id="searchform" method="get" action="http://www.zhenv5.com">
+				<input type="text" value="" name="s" id="s" size="30" />
+				<button type="submit">搜索</button>
+			</form>
+		</div><div class="clear"></div>
+<div class="topnav">
+<ul id="nav" class="menu"><li id="menu-item-924" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-924"><a title="Home" href="http://www.zhenv5.com/">首页</a></li>
+<li id="menu-item-936" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-936"><a title="Based Category" href="http://www.zhenv5.com/?page_id=80">分类目录</a></li>
+<li id="menu-item-926" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-926"><a title="Based Time" href="http://www.zhenv5.com/?page_id=921">文章归档</a></li>
+<li id="menu-item-930" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-930"><a title="All Tags" href="http://www.zhenv5.com/?page_id=929">标签云集</a></li>
+<li id="menu-item-928" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-928"><a title="友情链接" href="http://www.zhenv5.com/?page_id=918">友情链接</a></li>
+<li id="menu-item-927" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-927"><a title="@ Me" href="http://www.zhenv5.com/?page_id=920">灌水留言</a></li>
+<li id="menu-item-925" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-925"><a title="Find Me" href="http://www.zhenv5.com/?page_id=922">关于</a></li>
+</ul></div>
+<div id="rss"><ul>
+<li class="rssfeed"><a href="http://www.zhenv5.com/?feed=rss2" target="_blank" class="icon1" title="欢迎订阅兰叶春葳蕤,桂华秋皎洁|大风堂"></a></li>
+<li class="tqq"><a href="http://t.qq.com/sjk2412" target="_blank" class="icon2" title="我的腾讯微博"></a></li><li class="tsina"><a href="http://weibo.com/webir" target="_blank" class="icon3" title="我的新浪微博"></a></li><li class="rssmail"><a href="http://mail.qq.com/cgi-bin/feed?u=http://www.zhenv5.com/?feed=rss2" target="_blank" class="icon4" title="用QQ邮箱阅读空间订阅我的博客"></a></li></ul></div>
+<div class="clear"></div>
+</div>
+</div><div id="roll"><div title="回到顶部" id="roll_top"></div><div title="查看评论" id="ct"></div><div title="转到底部" id="fall"></div></div>
+<div id="content">
+<div class="main"><div class="left">
+<div class="post_date"><span class="date_m">Feb</span><span class="date_d">23</span><span class="date_y">2012</span></div>
+<div class="article">
+<h2>梯度下降与神经网络</h2>
+<div class="article_info">作者：真威武 &nbsp; 发布：2012-02-23 20:55 &nbsp; 分类：<a href="http://www.zhenv5.com/?cat=418" title="查看 神经网络 中的全部文章" rel="category">神经网络</a> &nbsp; 阅读：1247 views &nbsp; <a href="http://www.zhenv5.com/?p=958#comments" title="《梯度下降与神经网络》上的评论">2条评论</a> &nbsp; </div><div class="clear"></div>
+        <div class="context">
+        <p><span style="font-size:18px;"><a href="http://www.zhenv5.com/?p=958" target="_blank"><img alt="Neural Network" height="250" src="http://ww3.sinaimg.cn/mw600/51e6c2e3jw1dqci8pvtw3g.gif" title="Neural Network" width="320" /></a><span id="more-958"></span></span></p>
+<p><span style="font-size:18px;">对一个回归问题，假设学习的函数为线性的，即：</span></p>
+<p><span style="font-size:18px;"><br />
+	</span></p>
+<p><span style="font-size:18px;"><p style='text-align:center;'><span class='MathJax_Preview'><img src='http://www.zhenv5.com/wp-content/plugins/latex/cache/tex_87ba6fd4fb7795112e523e1c9202ffe0.gif' style='vertical-align: middle; border: none;' class='tex' alt="h(x) = {w_0} + {w_1}{x_1} + ... + {w_n}{x_n} = \sum\limits_{i = 0}^n {{w_i}{x_i}} ?= {W^T}X,{x_0} = 1" /></span><script type='math/tex;  mode=display'>h(x) = {w_0} + {w_1}{x_1} + ... + {w_n}{x_n} = \sum\limits_{i = 0}^n {{w_i}{x_i}} ?= {W^T}X,{x_0} = 1</script></p></span></p>
+<div><span style="font-size:18px;"><br />
+	</span></div>
+<div><span style="font-size:18px;"><br />
+	</span></div>
+<div><span style="font-size:18px;">然后需要定义一个损失函数loss function 或错误函数 error function,我们使用least mean square error:</span></div>
+<div>
+<div><span style="font-size:18px;"><p style='text-align:center;'><span class='MathJax_Preview'><img src='http://www.zhenv5.com/wp-content/plugins/latex/cache/tex_00addd3fe4bd6c2d75507d30e837d646.gif' style='vertical-align: middle; border: none;' class='tex' alt="J(\omega ) = \frac{1}{2}\sum\limits_{i = 1}^m {{{(h({x^i}) - {y^i})}^2}} " /></span><script type='math/tex;  mode=display'>J(\omega ) = \frac{1}{2}\sum\limits_{i = 1}^m {{{(h({x^i}) - {y^i})}^2}} </script></p></span></div>
+</div>
+<div><span style="font-size:18px;">&nbsp;如何调整w使上述损失函数最小，可以用最小二乘法，也可以使用<span class='wp_keywordlink_affiliate'><a href="http://www.zhenv5.com/?tag=%e6%a2%af%e5%ba%a6%e4%b8%8b%e9%99%8d" title="查看 梯度下降 中的全部文章" target="_blank">梯度下降</a></span>的算法。</span></div>
+<div><span style="font-size:18px;">对梯度，维基百科上有对它的解释，在单变量的实值函数下，梯度就是导数，对线性函数，梯度就是其斜率。</span></div>
+<div><span style="font-size:18px;">考虑一座山，点（x,y）对应的h(x,y)表明了该山的高度，那该点的梯度就表示为该点坡度最陡的方向。梯度的大小表明这个坡到底有多陡。</span></div>
+<div>&nbsp;</div>
+<div><span style="font-size:18px;">如果一个函数F(x),在点a出可导且有定义，则F(x)在点a出沿着梯度相反的方向 </span><img alt="-\nabla F(\mathbf{a})" class="tex" src="http://upload.wikimedia.org/wikipedia/zh/math/1/a/0/1a088e3036b0644eb8cdce66185847c7.png" style="border-top-style: none; border-right-style: none; border-bottom-style: none; border-left-style: none; border-width: initial; border-color: initial; border-image: initial; vertical-align: middle; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; color: rgb(0, 0, 0); font-family: sans-serif; font-size: 20px; line-height: 30px; " /><span style="color: rgb(0, 0, 0); font-family: sans-serif; font-size: 20px; line-height: 30px; ">&nbsp;下降最快。</span></div>
+<div>
+<div>&nbsp;</div>
+<div><span style="font-size: 19px; ">对上面使用的loss function求导：</span></div>
+<div>
+<div><span style="font-size:18px;"><p style='text-align:center;'><span class='MathJax_Preview'><img src='http://www.zhenv5.com/wp-content/plugins/latex/cache/tex_95f1ec611b7acb9013dc6c4df2570b29.gif' style='vertical-align: middle; border: none;' class='tex' alt="\frac{\partial }{{\partial ({\omega _j})}}J(\omega ) = \sum\limits_{i = 1}^m {(h({x^i}) - {y^i})\frac{\partial }{{\partial ({\omega _j})}}} h({x^i}) = \sum\limits_{i = 1}^m {(h({x^i}) - {y^i})x_j^i} " /></span><script type='math/tex;  mode=display'>\frac{\partial }{{\partial ({\omega _j})}}J(\omega ) = \sum\limits_{i = 1}^m {(h({x^i}) - {y^i})\frac{\partial }{{\partial ({\omega _j})}}} h({x^i}) = \sum\limits_{i = 1}^m {(h({x^i}) - {y^i})x_j^i} </script></p></span></div>
+<div>
+<div><span style="font-size: 19px;"><p style='text-align:center;'><span class='MathJax_Preview'><img src='http://www.zhenv5.com/wp-content/plugins/latex/cache/tex_a7a3707e9fc7f90221d601f61d79d84c.gif' style='vertical-align: middle; border: none;' class='tex' alt="x_j^i\;\;\;\;\;means\;\;\;\;\;the\;\;\;\;\;i - th\;\;\;\;training\;\;\;\;item's\;\;\;\;j - th\;\;\;feature" /></span><script type='math/tex;  mode=display'>x_j^i\;\;\;\;\;means\;\;\;\;\;the\;\;\;\;\;i - th\;\;\;\;training\;\;\;\;item's\;\;\;\;j - th\;\;\;feature</script></p></span></div>
+</p></div>
+</p></div>
+<div>&nbsp;</div>
+<div><span style="font-size:18px;">其中m为训练样本的数量，如果利用上述公式来更新下一轮权重向量的第j个分量的值，则称这种方法为batch <span class='wp_keywordlink_affiliate'><a href="http://www.zhenv5.com/?tag=gradient-decent" title="查看 gradient decent 中的全部文章" target="_blank">gradient decent</a></span>。</span></div>
+<div><span style="font-size:18px;">即把所有的样本跑一遍之后再确定梯度，以此更新下一轮的权重向量。</span></div>
+<div><span style="font-size:18px;">即：</span></div>
+<div><span style="font-size:18px;">Repeat until convergence</span></div>
+<div><span style="font-size:18px;">{<br />
+		</span></div>
+<div><span style="font-size:18px;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<p style='text-align:center;'><span class='MathJax_Preview'><img src='http://www.zhenv5.com/wp-content/plugins/latex/cache/tex_f0bbe59a77a039f8d76eb81fb49b063a.gif' style='vertical-align: middle; border: none;' class='tex' alt="{w_j}: = {w_j} - \alpha \sum\limits_{i = 1}^m {(h({x^i}) - {y^i})x_j^i} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} (for{\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} every{\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} j)" /></span><script type='math/tex;  mode=display'>{w_j}: = {w_j} - \alpha \sum\limits_{i = 1}^m {(h({x^i}) - {y^i})x_j^i} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} (for{\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} every{\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} j)</script></p></span></div>
+<div><span style="font-size:18px;"><br />
+		</span></div>
+<div><span style="font-size:18px;">}</span></div>
+<div><span style="font-size: 20px;">具体算法如下：</span></div>
+<div>
+<div>
+<div><p style='text-align:center;'><span class='MathJax_Preview'><img src='http://www.zhenv5.com/wp-content/plugins/latex/cache/tex_433c523e66cbf169d66df381729c278a.gif' style='vertical-align: middle; border: none;' class='tex' alt="1.Initialize\;\;all\;\;weights\;\;to\;\;small\;\;random\;\;values" /></span><script type='math/tex;  mode=display'>1.Initialize\;\;all\;\;weights\;\;to\;\;small\;\;random\;\;values</script></p></div>
+</p></div>
+</p></div>
+<div>
+<div><p style='text-align:center;'><span class='MathJax_Preview'><img src='http://www.zhenv5.com/wp-content/plugins/latex/cache/tex_9e7228fcfe4bdeb5512c1c24fca5bb2b.gif' style='vertical-align: middle; border: none;' class='tex' alt="2.REPEAT\;\;until\;\;done" /></span><script type='math/tex;  mode=display'>2.REPEAT\;\;until\;\;done</script></p></div>
+</p></div>
+<div>
+<div><p style='text-align:center;'><span class='MathJax_Preview'><img src='http://www.zhenv5.com/wp-content/plugins/latex/cache/tex_801a8a5bf5d41885d7d1e23f996d4207.gif' style='vertical-align: middle; border: none;' class='tex' alt="\;\;\;\;\;\;\;2.1\;{\rm{For}}\;\;each\;\;weight\;\;{w_j}\;,\;set\;\;\Delta {w_j} = 0" /></span><script type='math/tex;  mode=display'>\;\;\;\;\;\;\;2.1\;{\rm{For}}\;\;each\;\;weight\;\;{w_j}\;,\;set\;\;\Delta {w_j} = 0</script></p></div>
+</p></div>
+<div>
+<div><p style='text-align:center;'><span class='MathJax_Preview'><img src='http://www.zhenv5.com/wp-content/plugins/latex/cache/tex_28c31cced8663098737236f724d0f590.gif' style='vertical-align: middle; border: none;' class='tex' alt="\;\;\;\;\;\;\;2.2\;{\rm{For}}\;\;each\;\;input\;\;training\;\;data\;(x,y),\;the\;i - th\;\;item\;\;is\;\;({x^i},{y^i})" /></span><script type='math/tex;  mode=display'>\;\;\;\;\;\;\;2.2\;{\rm{For}}\;\;each\;\;input\;\;training\;\;data\;(x,y),\;the\;i - th\;\;item\;\;is\;\;({x^i},{y^i})</script></p></div>
+</p></div>
+<div>
+<div><p style='text-align:center;'><span class='MathJax_Preview'><img src='http://www.zhenv5.com/wp-content/plugins/latex/cache/tex_f5323e04ba9a9b90506aa2b43da46d1c.gif' style='vertical-align: middle; border: none;' class='tex' alt="\;\;\;\;\;\;\;\;\;\;\;2.2.1\;{\rm{Compute}}\;\;\Delta {{\rm{w}}_j} = \Delta {w_j} + (h({x^i}) - {y^i})x_j^i" /></span><script type='math/tex;  mode=display'>\;\;\;\;\;\;\;\;\;\;\;2.2.1\;{\rm{Compute}}\;\;\Delta {{\rm{w}}_j} = \Delta {w_j} + (h({x^i}) - {y^i})x_j^i</script></p></div>
+</p></div>
+<div>
+<div><p style='text-align:center;'><span class='MathJax_Preview'><img src='http://www.zhenv5.com/wp-content/plugins/latex/cache/tex_6e0fa21a2577f9678d119b1bbc026ed5.gif' style='vertical-align: middle; border: none;' class='tex' alt="3.\;For\;\;each\;\;weight\;\;{w_j} = {w_j} + \alpha \Delta {w_j},\;\;\alpha \;is\;the\;learning\;rate" /></span><script type='math/tex;  mode=display'>3.\;For\;\;each\;\;weight\;\;{w_j} = {w_j} + \alpha \Delta {w_j},\;\;\alpha \;is\;the\;learning\;rate</script></p></div>
+</p></div>
+<div>&nbsp;</div>
+<div><span style="font-size:18px;">第一步，利用随机数初始化权重向量，通过我的实验发现，对w0的值影响较大，而对其他的分量影响不大，到最后收敛的值差别不大。</span></div>
+<div><span style="font-size:18px;">将权重向量w的各个分量wj组合在一起就得到了下一轮所要使用的新的权重向量w</span></div>
+<div><span style="font-size:18px;">如果我们把更新权重向量时不是一下使用所有的样本，而是一个训练样本更新一次，我们就会得到stochastic <span class='wp_keywordlink_affiliate'><a href="http://www.zhenv5.com/?tag=gradient-decent" title="查看 gradient decent 中的全部文章" target="_blank">gradient decent</a></span>算法，描述如下：</span></div>
+<div><span style="font-size:18px;">Loop</span></div>
+<div><span style="font-size:18px;">{<br />
+		</span></div>
+<div><span style="font-size:18px;">&nbsp; for i =1 to m,</span></div>
+<div><span style="font-size:18px;">&nbsp; &nbsp;{<br />
+		</span></div>
+<div><span style="font-size:18px;">&nbsp; &nbsp; &nbsp; &nbsp;<p style='text-align:center;'><span class='MathJax_Preview'><img src='http://www.zhenv5.com/wp-content/plugins/latex/cache/tex_7a08bcd0f5f95644dcf1f5604fe0b2b4.gif' style='vertical-align: middle; border: none;' class='tex' alt="{w_j}: = {w_j} - \alpha (h({x^i}) - {y^i})x_j^i{\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} (for{\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} every{\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} j)" /></span><script type='math/tex;  mode=display'>{w_j}: = {w_j} - \alpha (h({x^i}) - {y^i})x_j^i{\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} (for{\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} every{\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} {\kern 1pt} j)</script></p></span></div>
+<div><span style="font-size:18px;"><br />
+		</span></div>
+<div><span style="font-size:18px;">&nbsp; &nbsp; }</span></div>
+<div><span style="font-size:18px;">}</span></div>
+<div><span style="font-size:18px;"><span class='wp_keywordlink_affiliate'><a href="http://www.zhenv5.com/?tag=%e6%a2%af%e5%ba%a6%e4%b8%8b%e9%99%8d" title="查看 梯度下降 中的全部文章" target="_blank">梯度下降</a></span>算法对学习速率<p style='text-align:center;'><span class='MathJax_Preview'><img src='http://www.zhenv5.com/wp-content/plugins/latex/cache/tex_bccfc7022dfb945174d9bcebad2297bb.gif' style='vertical-align: middle; border: none;' class='tex' alt="\alpha " /></span><script type='math/tex;  mode=display'>\alpha </script></p>的值非常敏感，学习速率的值越大，步长越大收敛的速度就会越快。学习速率越小，步长就小，需要迭代的次数就会多些。</span></div>
+<div><span style="font-size: 19px;">学习速率，learning rate的值的选择要慎重，如果太大，迭代不了几次就有可能出现数值变为inf,nan这种类似的情况。我做实验的时候出现了这种情况曾经一度认为算法写错了，之后调小了learning rate的值实验才成功。</span></div>
+<div><a href="http://ww2.sinaimg.cn/mw600/51e6c2e3jw1dqeiv8tlp3j.jpg" rel="lightbox[958]"><img alt="" class="aligncenter" height="352" src="http://ww2.sinaimg.cn/mw600/51e6c2e3jw1dqeiv8tlp3j.jpg" title="梯度下降学习速率迭代收敛" width="600" /></a></div>
+<div><span style="font-size:18px;"><br />
+		</span></div>
+<div><span style="font-size:18px;">learning rate的值可以是定值也可以是自适应的，总之要慎重。</span></div>
+<div><span style="font-size:18px;">收敛情况的判定我们可以利用前后两次的权重向量的变化来进行判定，如果：</span></div>
+<div>
+<div><span style="font-size:18px;"><p style='text-align:center;'><span class='MathJax_Preview'><img src='http://www.zhenv5.com/wp-content/plugins/latex/cache/tex_3edaa9ca56c4cd8e8a28b38736cd60e5.gif' style='vertical-align: middle; border: none;' class='tex' alt="|{w^i} - {w^{i - 1}}|| < \varepsilon " /></span><script type='math/tex;  mode=display'>|{w^i} - {w^{i - 1}}|| < \varepsilon </script></p></span></div>
+</p></div>
+<div><span style="font-size:18px;">我们就可以终止迭代了。</span></div>
+<div><span style="font-size:18px;"><span class='wp_keywordlink_affiliate'><a href="http://www.zhenv5.com/?tag=%e6%a2%af%e5%ba%a6%e4%b8%8b%e9%99%8d" title="查看 梯度下降 中的全部文章" target="_blank">梯度下降</a></span>的python源代码，下载地址：<a href="http://www.kuaipan.com.cn/file/id_1844709928552967.htm">点这里</a>。gradient.py里有batch gradient的算法和stochastic <span class='wp_keywordlink_affiliate'><a href="http://www.zhenv5.com/?tag=gradient-decent" title="查看 gradient decent 中的全部文章" target="_blank">gradient decent</a></span>。dataset文件下为实验所用的数据集。【请原谅我三俗的编码风格】</span></div>
+<div><span style="font-size:18px;">这篇文章的题目是<span class='wp_keywordlink_affiliate'><a href="http://www.zhenv5.com/?tag=%e6%a2%af%e5%ba%a6%e4%b8%8b%e9%99%8d" title="查看 梯度下降 中的全部文章" target="_blank">梯度下降</a></span>和<span class='wp_keywordlink_affiliate'><a href="http://www.zhenv5.com/?tag=%e7%a5%9e%e7%bb%8f%e7%bd%91%e7%bb%9c" title="查看 神经网络 中的全部文章" target="_blank">神经网络</a></span>，上面主要写的是<span class='wp_keywordlink_affiliate'><a href="http://www.zhenv5.com/?tag=%e6%a2%af%e5%ba%a6%e4%b8%8b%e9%99%8d" title="查看 梯度下降 中的全部文章" target="_blank">梯度下降</a></span>的部分，没见和<span class='wp_keywordlink_affiliate'><a href="http://www.zhenv5.com/?tag=%e7%a5%9e%e7%bb%8f%e7%bd%91%e7%bb%9c" title="查看 神经网络 中的全部文章" target="_blank">神经网络</a></span>有关系啊？</span></div>
+<div><span style="font-size:18px;">且慢，你还记得上述要求解的线性函数么？</span></div>
+<div><span style="font-size:18px;">对一个单层的线性<span class='wp_keywordlink_affiliate'><a href="http://www.zhenv5.com/?tag=%e7%a5%9e%e7%bb%8f%e7%bd%91%e7%bb%9c" title="查看 神经网络 中的全部文章" target="_blank">神经网络</a></span>而言，如图：</span></div>
+<div><a href="http://ww4.sinaimg.cn/mw600/51e6c2e3jw1dqfkfi3d5tg.gif" rel="lightbox[958]"><img alt="" class="alignnone" height="419" src="http://ww4.sinaimg.cn/mw600/51e6c2e3jw1dqfkfi3d5tg.gif" title="单层线性神经网络" width="437" /></a></div>
+<div><span style="font-size:18px;">这里bias就是上面的x0,w30相当于前面的w0，这里为什么费劲要加个bias呢？即加上x0和w0的意义在哪呢？</span></div>
+<div>&nbsp;</div>
+<div><span style="font-size:18px;">在很多资料里面都是一笔带过，说这样可以写成：</span></div>
+<div>
+<div><span style="font-size:18px;"><p style='text-align:center;'><span class='MathJax_Preview'><img src='http://www.zhenv5.com/wp-content/plugins/latex/cache/tex_2f0e6336be1b46fcf6b74a151b610527.gif' style='vertical-align: middle; border: none;' class='tex' alt="\sum\limits_{i = 0}^n {{w_i}{x_i}} ?= {W^T}X,{x_0} = 1" /></span><script type='math/tex;  mode=display'>\sum\limits_{i = 0}^n {{w_i}{x_i}} ?= {W^T}X,{x_0} = 1</script></p></span></div>
+<div>&nbsp;</div>
+</p></div>
+<div><span style="font-size:18px;">但是去了不照样可以么。</span></div>
+<div>&nbsp;</div>
+<div><span style="font-size:18px;">其实呢，原因很简单，如果不加x0,w0的表达式即为形如</span></div>
+<div><span style="font-size:18px;">y=ax+bx+cx的形式，最后学习到的超平面必然经过原点，泛化能力不强，因此需要加一个偏移，即wo。</span></div>
+<div><span style="font-size:18px;">这样，就可以用<span class='wp_keywordlink_affiliate'><a href="http://www.zhenv5.com/?tag=%e6%a2%af%e5%ba%a6%e4%b8%8b%e9%99%8d" title="查看 梯度下降 中的全部文章" target="_blank">梯度下降</a></span>的算法来求解<span class='wp_keywordlink_affiliate'><a href="http://www.zhenv5.com/?tag=%e7%a5%9e%e7%bb%8f%e7%bd%91%e7%bb%9c" title="查看 神经网络 中的全部文章" target="_blank">神经网络</a></span>权重向量的值，便把<span class='wp_keywordlink_affiliate'><a href="http://www.zhenv5.com/?tag=%e6%a2%af%e5%ba%a6%e4%b8%8b%e9%99%8d" title="查看 梯度下降 中的全部文章" target="_blank">梯度下降</a></span>和神经网络联系在一起了。</span></div>
+<div><span style="font-size:18px;">上述只是对线性的问题进行的分析，没有讨论非线性的问题和多层神经网络。</span></div>
+<div><span style="font-size:18px;">推荐一个关于神经网络学习的链接：<a href="http://www.willamette.edu/~gorr/classes/cs449/intro.html">点这里</a></span></div>
+</div>
+<div class="wumii-hook">
+<input type="hidden" name="wurl" value="http://www.zhenv5.com/?p=958" />
+<input type="hidden" name="wtitle" value="梯度下降与神经网络" />
+<input type="hidden" name="wpic" value="" />
+</div>
+<div class="similarity"><h2>中奖了，再来一碗</h2><ul><li><a href="http://www.zhenv5.com/?p=901">learning  to rank ：ListNet</a> (0.500)</li><li><a href="http://www.zhenv5.com/?p=588">[转]机器学习中的数学(1)-回归(regression)、梯度下降(gradient descent)</a> (0.200)</li></ul></div><!-- Mix --><p>本文固定链接: <a href="http://www.zhenv5.com/?p=958" rel="bookmark" title="梯度下降与神经网络">http://www.zhenv5.com/?p=958 | 兰叶春葳蕤,桂华秋皎洁|大风堂</a></p></div>
+        </div>
+</div>
+<div class="articles">
+<div class="author_pic">
+					<a href="#" title="我不去想是否能够成功
+ 既然选择了远方
+ 便只顾风雨兼程"><img alt='' src='http://0.gravatar.com/avatar/c2ae7018a0436d1208a6b0a303bd476b?s=48&amp;d=http%3A%2F%2Fwww.zhenv5.com%2Fwp-content%2Fthemes%2Fweisaysimple%2Fimages%2Fgravatar.png%3Fs%3D48&amp;r=G' class='avatar avatar-48 photo' height='48' width='48' /></a>
+				</div>
+<!-- 将此标记放在您希望呈现 +1 按钮的位置 -->
+<g:plusone size="tall" annotation="inline"></g:plusone>
+
+<!-- 将此呈现调用放在适当的位置 -->
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+<div class="author_text">
+			<span class="spostinfo">
+				该日志由 真威武 于2012年02月23日发表在 <a href="http://www.zhenv5.com/?cat=418" title="查看 神经网络 中的全部文章" rel="category">神经网络</a> 分类下，
+								看完这篇文章觉得有点意思有点收获，你可以点击上方的+1按钮或至底部留下脚丫。
+				<br/>
+				原创文章转载请注明: <a href="http://www.zhenv5.com/?p=958" rel="bookmark" title="本文固定链接 http://www.zhenv5.com/?p=958">梯度下降与神经网络 | 兰叶春葳蕤,桂华秋皎洁|大风堂</a><br/>
+				关键字: <a href="http://www.zhenv5.com/?tag=gradient-decent" rel="tag">gradient decent</a>, <a href="http://www.zhenv5.com/?tag=neural-network" rel="tag">neural network</a>, <a href="http://www.zhenv5.com/?tag=%e6%a2%af%e5%ba%a6%e4%b8%8b%e9%99%8d" rel="tag">梯度下降</a>, <a href="http://www.zhenv5.com/?tag=%e7%a5%9e%e7%bb%8f%e7%bd%91%e7%bb%9c" rel="tag">神经网络</a>			</span>
+				</div>
+</div>
+
+<div class="articles">
+【上一篇】<a href="http://www.zhenv5.com/?p=956" rel="prev">MathType输入空格</a><br/>【下一篇】<a href="http://www.zhenv5.com/?p=962" rel="next">Win8初体验</a></div>
+
+<div class="articles">
+<div class="relatedposts">
+	<h3>您可能还会对这些文章感兴趣！</h3><ol>			<li><a href="http://www.zhenv5.com/?p=901" rel="bookmark" title="learning  to rank ：ListNet">learning  to rank ：ListNet(1)</a></li>
+						<li><a href="http://www.zhenv5.com/?p=588" rel="bookmark" title="[转]机器学习中的数学(1)-回归(regression)、梯度下降(gradient descent)">[转]机器学习中的数学(1)-回归(regression)、梯度(2)</a></li>
+			</ol></div><div class="clear"></div>
+</div>
+
+<div class="articles">
+<!-- You can start editing here. -->
+	<h3 id="comments">梯度下降与神经网络：目前有2 条留言</h3>
+	<ol class="commentlist">
+	<li class="comment byuser comment-author-my-zhao even thread-even depth-1" id="comment-4811">
+   <div id="div-comment-4811" class="comment-body">
+      		<div class="comment-author vcard">						<img src='http://www.zhenv5.com/avatar/98ce83b84c1a1fe396d3d460abe3c957.jpg' alt='' class='avatar' />
+                								<div class="floor">沙发         </div><strong><a href='http://www.zhenv5.com' rel='external nofollow' class='url'>棉花糖</a></strong>:</div>
+				<p>关于bias,我们当时是这样讲的，neural network的输出大于某个threshold的时候认为是1，小于这个threshold就认为是-1，要判断sum(wx)&gt;t,等价于sum(wx)-t&gt;0,这个t就写成了w*1的形式。不过看起来你的解释更专业</p>
+        
+		<div class="clear"></div><span class="datetime">2012-02-28 下午 5:11 </span> <span class="reply"><a class='comment-reply-link' href='/?p=958&#038;replytocom=4811#respond' onclick='return addComment.moveForm("div-comment-4811", "4811", "respond", "958")'>[回复]</a></span>
+  </div>
+<ul class='children'>
+<li class="comment byuser comment-author-jkmy bypostauthor odd alt depth-2" id="comment-4812">
+   <div id="div-comment-4812" class="comment-body">
+      		<div class="comment-author vcard">						<img src='http://www.zhenv5.com/avatar/c2ae7018a0436d1208a6b0a303bd476b.jpg' alt='' class='avatar' />
+                								<div class="floor">         </div><strong><a href='http://www.zhenv5.com' rel='external nofollow' class='url'>哈萨雅琪</a></strong>:</div>
+				<p>其实本质是一样的，threshold为0就过原点啊，不失一般性，就出现了w1</p>
+        
+		<div class="clear"></div><span class="datetime">2012-02-28 下午 9:49 </span> <span class="reply"><a class='comment-reply-link' href='/?p=958&#038;replytocom=4812#respond' onclick='return addComment.moveForm("div-comment-4812", "4812", "respond", "958")'>[回复]</a></span>
+  </div>
+</li></ul>
+</li>	</ol>
+	<div class="navigation">
+		<div class="pagination"></div>
+	</div>
+
+ 		<div id="respond_box">
+	<div id="respond">
+		<h3>发表评论</h3>	
+		<div class="cancel-comment-reply">
+		<div id="real-avatar">
+			<img alt='' src='http://0.gravatar.com/avatar/?d=http://www.zhenv5.com/wp-content/themes/weisaysimple/images/gravatar.png&amp;s=40' class='avatar avatar-40 photo avatar-default' height='40' width='40' />	</div>	
+			<small><a rel="nofollow" id="cancel-comment-reply-link" href="/?p=958#respond" style="display:none;">点击这里取消回复。</a></small>
+		</div>
+		    <form action="http://www.zhenv5.com/wp-comments-post.php" method="post" id="commentform">
+      		<div id="comment-author-info">
+		<p>
+			<input type="text" name="author" id="author" class="commenttext" value="" size="22" tabindex="1" />
+			<label for="author">昵称</label>
+		</p>
+		<p>
+			<input type="text" name="email" id="email" class="commenttext" value="" size="22" tabindex="2" />
+			<label for="email">邮箱 <a id="Get_Gravatar"  title="查看如何申请一个自己的Gravatar全球通用头像" target="_blank" href="http://www.zhenv5.com/?p=650">（教你设置自己的个性头像）</a></label>
+		</p>
+		<p>
+			<input type="text" name="url" id="url" class="commenttext" value="" size="22" tabindex="3" />
+			<label for="url">网址</label>
+		</p>
+	</div>
+      		<!--<p><small><strong>XHTML:</strong> You can use these tags: <code>&lt;a href=&quot;&quot; title=&quot;&quot;&gt; &lt;abbr title=&quot;&quot;&gt; &lt;acronym title=&quot;&quot;&gt; &lt;b&gt; &lt;blockquote cite=&quot;&quot;&gt; &lt;cite&gt; &lt;code&gt; &lt;del datetime=&quot;&quot;&gt; &lt;em&gt; &lt;i&gt; &lt;q cite=&quot;&quot;&gt; &lt;strike&gt; &lt;strong&gt; </code></small></p>-->
+      <div class="clear"></div>
+      <p><script type="text/javascript">
+/* <![CDATA[ */
+    function grin(tag) {
+    	var myField;
+    	tag = ' ' + tag + ' ';
+        if (document.getElementById('comment') && document.getElementById('comment').type == 'textarea') {
+    		myField = document.getElementById('comment');
+    	} else {
+    		return false;
+    	}
+    	if (document.selection) {
+    		myField.focus();
+    		sel = document.selection.createRange();
+    		sel.text = tag;
+    		myField.focus();
+    	}
+    	else if (myField.selectionStart || myField.selectionStart == '0') {
+    		var startPos = myField.selectionStart;
+    		var endPos = myField.selectionEnd;
+    		var cursorPos = endPos;
+    		myField.value = myField.value.substring(0, startPos)
+    					  + tag
+    					  + myField.value.substring(endPos, myField.value.length);
+    		cursorPos += tag.length;
+    		myField.focus();
+    		myField.selectionStart = cursorPos;
+    		myField.selectionEnd = cursorPos;
+    	}
+    	else {
+    		myField.value += tag;
+    		myField.focus();
+    	}
+    }
+/* ]]> */
+</script>
+<a href="javascript:grin(':?:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_question.gif" alt="" /></a>
+<a href="javascript:grin(':razz:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_razz.gif" alt="" /></a>
+<a href="javascript:grin(':sad:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_sad.gif" alt="" /></a>
+<a href="javascript:grin(':evil:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_evil.gif" alt="" /></a>
+<a href="javascript:grin(':!:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_exclaim.gif" alt="" /></a>
+<a href="javascript:grin(':smile:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_smile.gif" alt="" /></a>
+<a href="javascript:grin(':oops:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_redface.gif" alt="" /></a>
+<a href="javascript:grin(':grin:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_biggrin.gif" alt="" /></a>
+<a href="javascript:grin(':eek:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_surprised.gif" alt="" /></a>
+<a href="javascript:grin(':shock:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_eek.gif" alt="" /></a>
+<a href="javascript:grin(':???:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_confused.gif" alt="" /></a>
+<a href="javascript:grin(':cool:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_cool.gif" alt="" /></a>
+<a href="javascript:grin(':lol:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_lol.gif" alt="" /></a>
+<a href="javascript:grin(':mad:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_mad.gif" alt="" /></a>
+<a href="javascript:grin(':twisted:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_twisted.gif" alt="" /></a>
+<a href="javascript:grin(':roll:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_rolleyes.gif" alt="" /></a>
+<a href="javascript:grin(':wink:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_wink.gif" alt="" /></a>
+<a href="javascript:grin(':idea:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_idea.gif" alt="" /></a>
+<a href="javascript:grin(':arrow:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_arrow.gif" alt="" /></a>
+<a href="javascript:grin(':neutral:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_neutral.gif" alt="" /></a>
+<a href="javascript:grin(':cry:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_cry.gif" alt="" /></a>
+<a href="javascript:grin(':mrgreen:')"><img src="http://www.zhenv5.com/wp-includes/images/smilies/icon_mrgreen.gif" alt="" /></a>
+<br />
+</p>
+		<p><textarea name="comment" id="comment" tabindex="4"></textarea></p>
+		<p>
+			<input class="submit" name="submit" type="submit" id="submit" tabindex="5" value="提交留言" />
+			<input class="reset" name="reset" type="reset" id="reset" tabindex="6" value="重写" />
+			<input type='hidden' name='comment_post_ID' value='958' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+		</p>
+		<script type="text/javascript">	//Crel+Enter
+			$(document).keypress(function(e){
+				if(e.ctrlKey && e.which == 13 || e.which == 10) { 
+					$(".submit").click();
+					document.body.focus();
+				} else if (e.shiftKey && e.which==13 || e.which == 10) {
+					$(".submit").click();
+				}          
+			})
+		</script>
+		<p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="ab3fef162f" /></p>
+	<!-- Custom Smilies - Version 2.9.1 -->
+	<style type="text/css">
+	img.wp-smiley-select {cursor: pointer;}
+	</style>
+    <script type="text/javascript">
+    function grin(tag) {
+    	if (typeof tinyMCE != 'undefined') {
+    		grin_tinymcecomments(tag);
+    	} else {
+    		grin_plain(tag);
+    	}
+    }
+    function grin_tinymcecomments(tag) {
+    	tinyMCE.execCommand('mceInsertContent', false, ' ' + tag + ' ');
+    }
+    
+    function grin_plain(tag) {
+    	var myField;
+    	var myCommentTextarea = "comment";
+    	tag = ' ' + tag + ' ';
+        if (document.getElementById(myCommentTextarea) && document.getElementById(myCommentTextarea).type == 'textarea') {
+    		myField = document.getElementById(myCommentTextarea);
+    	} else {
+    		return false;
+    	}
+    	if (document.selection) {
+    		myField.focus();
+    		sel = document.selection.createRange();
+    		sel.text = tag;
+    		myField.focus();
+    	}
+    	else if (myField.selectionStart || myField.selectionStart == '0') {
+    		var startPos = myField.selectionStart;
+    		var endPos = myField.selectionEnd;
+    		var cursorPos = endPos;
+    		myField.value = myField.value.substring(0, startPos)
+    					  + tag
+    					  + myField.value.substring(endPos, myField.value.length);
+    		cursorPos += tag.length;
+    		myField.focus();
+    		myField.selectionStart = cursorPos;
+    		myField.selectionEnd = cursorPos;
+    	}
+    	else {
+    		myField.value += tag;
+    		myField.focus();
+    	}
+    }
+    
+    function moreSmilies() {
+    	document.getElementById('wp-smiley-more').style.display = 'inline';
+    	document.getElementById('wp-smiley-toggle').innerHTML = '<a href="javascript:lessSmilies()">&laquo;&nbsp;less</a></span>';
+    }
+    
+    function lessSmilies() {
+    	document.getElementById('wp-smiley-more').style.display = 'none';
+    	document.getElementById('wp-smiley-toggle').innerHTML = '<a href="javascript:moreSmilies()">more&nbsp;&raquo;</a>';
+    }
+    </script>
+<img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_wink.gif' alt=':wink:' onclick='grin(":wink:")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_twisted.gif' alt=':twisted:' onclick='grin(":twisted:")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_rolleyes.gif' alt=':roll:' onclick='grin(":roll:")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_redface.gif' alt=':oops:' onclick='grin(":oops:")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_mrgreen.gif' alt=':mrgreen:' onclick='grin(":mrgreen:")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_lol.gif' alt=':lol:' onclick='grin(":lol:")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_idea.gif' alt=':idea:' onclick='grin(":idea:")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_evil.gif' alt=':evil:' onclick='grin(":evil:")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_cry.gif' alt=':cry:' onclick='grin(":cry:")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_arrow.gif' alt=':arrow:' onclick='grin(":arrow:")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_question.gif' alt=':?:' onclick='grin(":?:")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_neutral.gif' alt=':-|' onclick='grin(":-|")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_mad.gif' alt=':-x' onclick='grin(":-x")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_surprised.gif' alt=':-o' onclick='grin(":-o")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_razz.gif' alt=':-P' onclick='grin(":-P")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_biggrin.gif' alt=':-D' onclick='grin(":-D")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_confused.gif' alt=':-?' onclick='grin(":-?")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_smile.gif' alt=':)' onclick='grin(":)")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_sad.gif' alt=':(' onclick='grin(":(")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_exclaim.gif' alt=':!:' onclick='grin(":!:")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_eek.gif' alt='8-O' onclick='grin("8-O")' class='wp-smiley-select' /> <img src='http://www.zhenv5.com/wp-includes/images/smilies/icon_cool.gif' alt='8)' onclick='grin("8)")' class='wp-smiley-select' /> 		<span style="padding:0 0 2px 8px">快捷键：Ctrl+Enter</span>
+    </form>
+
+	<div class="clear"></div>
+      </div>
+  </div>
+  </div>
+
+	</div>
+<!-- JiaThis Button BEGIN -->
+<script type="text/javascript" src="http://v2.jiathis.com/code/jiathis_r.js?type=left&amp;btn=l1.gif" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+<div id="sidebar">
+
+<div class="widget">
+	<h3></h3>
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+        <input type="hidden" name="cmd" value="_donations" />
+    <input type="hidden" name="business" value="sjk2412@163.com" /><input type="hidden" name="item_name" value="" /><input type="hidden" name="currency_code" value="HKD" /><input type="hidden" name="return" value="www.zhenv5.com/thankdonation.html" /><input type="image" src="http://www.zhenv5.com/wp-content/plugins/wp-paypal-donation-plugin/donate_btn.gif" name="submit" alt="Make payments with payPal - it's fast, free and secure!" /></form>			<div class="textwidget"><p><a href="http://feeds.feedburner.com/zhenv5/MqtP" rel="alternate" type="application/rss+xml"><img src="http://www.feedburner.com/fb/images/pub/feed-icon16x16.png" alt="" style="vertical-align:middle;border:0"/></a>&nbsp;<a href="http://feeds.feedburner.com/zhenv5/MqtP" rel="alternate" type="application/rss+xml">Subscribe in a reader</a></p></div>
+					<div class="textwidget"><p><a href="http://fusion.google.com/add?feedurl=http://feeds.feedburner.com/zhenv5/MqtP"><img src="http://buttons.googlesyndication.com/fusion/add.gif" width="104" height="17" style="border:0" alt="Add to Google Reader or Homepage"/></a></p></div>
+		<h3>五谷杂粮</h3>		<ul>
+	<li class="cat-item cat-item-6"><a href="http://www.zhenv5.com/?cat=6" title="计算机 科学 技术">CS&amp;T</a> (17)
+<ul class='children'>
+	<li class="cat-item cat-item-236"><a href="http://www.zhenv5.com/?cat=236" title="查看 CS 下的所有文章">CS</a> (5)
+</li>
+	<li class="cat-item cat-item-154"><a href="http://www.zhenv5.com/?cat=154" title="查看 技术 下的所有文章">技术</a> (12)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-149"><a href="http://www.zhenv5.com/?cat=149" title="数据挖掘与机器学习">DM &amp; ML</a> (10)
+<ul class='children'>
+	<li class="cat-item cat-item-416"><a href="http://www.zhenv5.com/?cat=416" title="查看 LETOR 下的所有文章">LETOR</a> (3)
+</li>
+	<li class="cat-item cat-item-438"><a href="http://www.zhenv5.com/?cat=438" title="查看 支持向量机 下的所有文章">支持向量机</a> (2)
+</li>
+	<li class="cat-item cat-item-418"><a href="http://www.zhenv5.com/?cat=418" title="查看 神经网络 下的所有文章">神经网络</a> (1)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-319"><a href="http://www.zhenv5.com/?cat=319" title="查看 Java 下的所有文章">Java</a> (4)
+</li>
+	<li class="cat-item cat-item-487"><a href="http://www.zhenv5.com/?cat=487" title="查看 MatLab 下的所有文章">MatLab</a> (1)
+</li>
+	<li class="cat-item cat-item-117"><a href="http://www.zhenv5.com/?cat=117" title="学习Python好榜样">Python</a> (31)
+<ul class='children'>
+	<li class="cat-item cat-item-137"><a href="http://www.zhenv5.com/?cat=137" title="Python拾遗教程">Python拾遗</a> (18)
+</li>
+	<li class="cat-item cat-item-136"><a href="http://www.zhenv5.com/?cat=136" title="Python编程实例">Python百分百</a> (13)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-202"><a href="http://www.zhenv5.com/?cat=202" title="查看 WordPress葵花宝典 下的所有文章">WordPress葵花宝典</a> (16)
+</li>
+	<li class="cat-item cat-item-3"><a href="http://www.zhenv5.com/?cat=3" title="别瞎说胡说瞎胡说哈">乱弹琴</a> (46)
+</li>
+	<li class="cat-item cat-item-452"><a href="http://www.zhenv5.com/?cat=452" title="文本检索 图像检索">信息检索</a> (2)
+</li>
+	<li class="cat-item cat-item-356"><a href="http://www.zhenv5.com/?cat=356" title="查看 并行计算 下的所有文章">并行计算</a> (2)
+</li>
+	<li class="cat-item cat-item-412"><a href="http://www.zhenv5.com/?cat=412" title="查看 推荐系统 下的所有文章">推荐系统</a> (2)
+</li>
+	<li class="cat-item cat-item-235"><a href="http://www.zhenv5.com/?cat=235" title="windows ubuntu">操作系统</a> (6)
+</li>
+	<li class="cat-item cat-item-436"><a href="http://www.zhenv5.com/?cat=436" title="查看 数学女皇 下的所有文章">数学女皇</a> (1)
+<ul class='children'>
+	<li class="cat-item cat-item-437"><a href="http://www.zhenv5.com/?cat=437" title="查看 概率统计 下的所有文章">概率统计</a> (1)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-475"><a href="http://www.zhenv5.com/?cat=475" title="查看 行游记 下的所有文章">行游记</a> (1)
+</li>
+		</ul>
+</div>
+
+<div class="widget"><div id="tab-title"><h3><span  class="selected">最新日志</span><span>热评日志</span><span>随机日志</span></h3>
+	<div id="tab-content">
+		<ul class="display">					<li><a href="http://www.zhenv5.com/?p=980" rel="bookmark" title="详细阅读 遗传算法">遗传算法</a></li>
+										<li><a href="http://www.zhenv5.com/?p=979" rel="bookmark" title="详细阅读 Matlab中的log">Matlab中的log</a></li>
+										<li><a href="http://www.zhenv5.com/?p=975" rel="bookmark" title="详细阅读 算法分析：插入排序和归并排序">算法分析：插入排序和归并排序</a></li>
+										<li><a href="http://www.zhenv5.com/?p=973" rel="bookmark" title="详细阅读 泉城公园游记">泉城公园游记</a></li>
+										<li><a href="http://www.zhenv5.com/?p=969" rel="bookmark" title="详细阅读 python多核并行模块PProcess">python多核并行模块PProcess</a></li>
+										<li><a href="http://www.zhenv5.com/?p=967" rel="bookmark" title="详细阅读 做研究与写论文">做研究与写论文</a></li>
+										<li><a href="http://www.zhenv5.com/?p=966" rel="bookmark" title="详细阅读 博客添加Google+">博客添加Google+</a></li>
+										<li><a href="http://www.zhenv5.com/?p=962" rel="bookmark" title="详细阅读 Win8初体验">Win8初体验</a></li>
+										<li><a href="http://www.zhenv5.com/?p=958" rel="bookmark" title="详细阅读 梯度下降与神经网络">梯度下降与神经网络</a></li>
+										<li><a href="http://www.zhenv5.com/?p=956" rel="bookmark" title="详细阅读 MathType输入空格">MathType输入空格</a></li>
+										<li><a href="http://www.zhenv5.com/?p=948" rel="bookmark" title="详细阅读 黑莓情深">黑莓情深</a></li>
+										<li><a href="http://www.zhenv5.com/?p=947" rel="bookmark" title="详细阅读 2012年Google的22个预言">2012年Google的22个预言</a></li>
+					</ul>
+<ul  class="hide"></ul>
+		<ul class="hide">					<li><a href="http://www.zhenv5.com/?p=863" rel="bookmark" title="详细阅读 Python Tips">Python Tips</a></li>
+										<li><a href="http://www.zhenv5.com/?p=901" rel="bookmark" title="详细阅读 learning  to rank ：ListNet">learning  to rank ：ListNet</a></li>
+										<li><a href="http://www.zhenv5.com/?p=909" rel="bookmark" title="详细阅读 SVM:函数间隔，几何间隔">SVM:函数间隔，几何间隔</a></li>
+										<li><a href="http://www.zhenv5.com/?p=650" rel="bookmark" title="详细阅读 拉风头像的来历">拉风头像的来历</a></li>
+										<li><a href="http://www.zhenv5.com/?p=948" rel="bookmark" title="详细阅读 黑莓情深">黑莓情深</a></li>
+										<li><a href="http://www.zhenv5.com/?p=416" rel="bookmark" title="详细阅读 Decision Tree决策树的学习">Decision Tree决策树的学习</a></li>
+										<li><a href="http://www.zhenv5.com/?p=107" rel="bookmark" title="详细阅读 评论插件WordPress Thread Comment">评论插件WordPress Thread Comment</a></li>
+										<li><a href="http://www.zhenv5.com/?p=438" rel="bookmark" title="详细阅读 Python编程100例之9">Python编程100例之9</a></li>
+										<li><a href="http://www.zhenv5.com/?p=865" rel="bookmark" title="详细阅读 爱上葡萄酒">爱上葡萄酒</a></li>
+										<li><a href="http://www.zhenv5.com/?p=619" rel="bookmark" title="详细阅读 淘宝搜索负责人谈淘宝搜索排序">淘宝搜索负责人谈淘宝搜索排序</a></li>
+										<li><a href="http://www.zhenv5.com/?p=812" rel="bookmark" title="详细阅读 命令查看CentOs内核及版本信息">命令查看CentOs内核及版本信息</a></li>
+										<li><a href="http://www.zhenv5.com/?p=969" rel="bookmark" title="详细阅读 python多核并行模块PProcess">python多核并行模块PProcess</a></li>
+					</ul>
+					</div></div></div>
+
+
+
+
+<div class="widget"><div class="top_comment">
+			</div>
+</div>
+
+<div class="widget">
+		</div>
+
+
+
+<div class="widget"><h3>热门标签</h3>	
+</a><a href='http://www.zhenv5.com/?tag=google' class='tag-link-238' title='7 个话题' style="color:#034be1;font-size: 21.756097561px;;">google</a>
+</a><a href='http://www.zhenv5.com/?tag=%e6%89%98%e7%a6%8f' class='tag-link-172' title='2 个话题' style="color:#37f241;font-size: 14.9268292683px;;">托福</a>
+</a><a href='http://www.zhenv5.com/?tag=%e9%bb%91%e8%8e%93' class='tag-link-128' title='3 个话题' style="color:#1d5ee8;font-size: 16.8780487805px;;">黑莓</a>
+</a><a href='http://www.zhenv5.com/?tag=iphone' class='tag-link-378' title='2 个话题' style="color:#223ce7;font-size: 14.9268292683px;;">IPhone</a>
+</a><a href='http://www.zhenv5.com/?tag=letor' class='tag-link-12' title='2 个话题' style="color:#46b938;font-size: 14.9268292683px;;">letor</a>
+</a><a href='http://www.zhenv5.com/?tag=%e6%a2%af%e5%ba%a6%e4%b8%8b%e9%99%8d' class='tag-link-204' title='3 个话题' style="color:#e3b3ea;font-size: 16.8780487805px;;">梯度下降</a>
+</a><a href='http://www.zhenv5.com/?tag=hadoop' class='tag-link-340' title='2 个话题' style="color:#412437;font-size: 14.9268292683px;;">Hadoop</a>
+</a><a href='http://www.zhenv5.com/?tag=slimstat' class='tag-link-35' title='2 个话题' style="color:#554b42;font-size: 14.9268292683px;;">slimstat</a>
+</a><a href='http://www.zhenv5.com/?tag=windows' class='tag-link-186' title='3 个话题' style="color:#375633;font-size: 16.8780487805px;;">windows</a>
+</a><a href='http://www.zhenv5.com/?tag=wp-to-top' class='tag-link-203' title='2 个话题' style="color:#e7991d;font-size: 14.9268292683px;;">wp to top</a>
+</a><a href='http://www.zhenv5.com/?tag=adaboost' class='tag-link-165' title='2 个话题' style="color:#2f1e3f;font-size: 14.9268292683px;;">AdaBoost</a>
+</a><a href='http://www.zhenv5.com/?tag=ssh' class='tag-link-322' title='2 个话题' style="color:#871bc5;font-size: 14.9268292683px;;">ssh</a>
+</a><a href='http://www.zhenv5.com/?tag=gradient-decent' class='tag-link-207' title='3 个话题' style="color:#21b7c0;font-size: 16.8780487805px;;">gradient decent</a>
+</a><a href='http://www.zhenv5.com/?tag=java' class='tag-link-148' title='7 个话题' style="color:#a07f7b;font-size: 21.756097561px;;">java</a>
+</a><a href='http://www.zhenv5.com/?tag=linux' class='tag-link-323' title='2 个话题' style="color:#253ce4;font-size: 14.9268292683px;;">Linux</a>
+</a><a href='http://www.zhenv5.com/?tag=%e6%8e%a8%e8%8d%90%e7%b3%bb%e7%bb%9f' class='tag-link-412' title='2 个话题' style="color:#914af7;font-size: 14.9268292683px;;">推荐系统</a>
+</a><a href='http://www.zhenv5.com/?tag=android' class='tag-link-383' title='2 个话题' style="color:#a8fc3b;font-size: 14.9268292683px;;">Android</a>
+</a><a href='http://www.zhenv5.com/?tag=%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0' class='tag-link-170' title='6 个话题' style="color:#26ddda;font-size: 20.9430894309px;;">机器学习</a>
+</a><a href='http://www.zhenv5.com/?tag=pairwise' class='tag-link-169' title='2 个话题' style="color:#d7b562;font-size: 14.9268292683px;;">PairWise</a>
+</a><a href='http://www.zhenv5.com/?tag=rar' class='tag-link-112' title='2 个话题' style="color:#097356;font-size: 14.9268292683px;;">rar</a>
+</a><a href='http://www.zhenv5.com/?tag=wordpress' class='tag-link-17' title='10 个话题' style="color:#8e7c96;font-size: 24.0325203252px;;">wordpress</a>
+</a><a href='http://www.zhenv5.com/?tag=eclipse' class='tag-link-247' title='3 个话题' style="color:#44e402;font-size: 16.8780487805px;;">Eclipse</a>
+</a><a href='http://www.zhenv5.com/?tag=%e7%9b%b8%e4%bc%bc%e5%ba%a6' class='tag-link-430' title='2 个话题' style="color:#028df6;font-size: 14.9268292683px;;">相似度</a>
+</a><a href='http://www.zhenv5.com/?tag=%e7%99%be%e5%ba%a6%e7%bb%9f%e8%ae%a1' class='tag-link-43' title='2 个话题' style="color:#8dd334;font-size: 14.9268292683px;;">百度统计</a>
+</a><a href='http://www.zhenv5.com/?tag=%e6%95%b0%e5%ad%a6' class='tag-link-367' title='2 个话题' style="color:#53dd73;font-size: 14.9268292683px;;">数学</a>
+</a><a href='http://www.zhenv5.com/?tag=%e5%a4%9a%e7%ba%bf%e7%a8%8b' class='tag-link-133' title='3 个话题' style="color:#3f2bcb;font-size: 16.8780487805px;;">多线程</a>
+</a><a href='http://www.zhenv5.com/?tag=write' class='tag-link-163' title='2 个话题' style="color:#21f050;font-size: 14.9268292683px;;">write</a>
+</a><a href='http://www.zhenv5.com/?tag=%e6%94%af%e6%8c%81%e5%90%91%e9%87%8f%e6%9c%ba' class='tag-link-440' title='2 个话题' style="color:#352c22;font-size: 14.9268292683px;;">支持向量机</a>
+</a><a href='http://www.zhenv5.com/?tag=svm-2' class='tag-link-439' title='2 个话题' style="color:#2b00e3;font-size: 14.9268292683px;;">SVM</a>
+</a><a href='http://www.zhenv5.com/?tag=%e5%86%8d%e6%9d%a5%e4%b8%80%e7%93%b6' class='tag-link-8' title='1 个话题' style="color:#53731e;font-size: 12px;;">再来一瓶</a>
+</a><a href='http://www.zhenv5.com/?tag=%e6%b0%b4%e6%b5%92%e4%bc%a0' class='tag-link-295' title='2 个话题' style="color:#64e8fb;font-size: 14.9268292683px;;">水浒传</a>
+</a><a href='http://www.zhenv5.com/?tag=%e5%b9%b6%e8%a1%8c' class='tag-link-210' title='2 个话题' style="color:#42c421;font-size: 14.9268292683px;;">并行</a>
+</a><a href='http://www.zhenv5.com/?tag=%e6%8d%95%e8%9b%87%e8%80%85%e8%af%b4' class='tag-link-117' title='33 个话题' style="color:#466729;font-size: 32px;;">Python</a>
+</a><a href='http://www.zhenv5.com/?tag=firefox' class='tag-link-189' title='2 个话题' style="color:#954953;font-size: 14.9268292683px;;">FireFox</a>
+</a><a href='http://www.zhenv5.com/?tag=mathtype' class='tag-link-426' title='2 个话题' style="color:#da74e8;font-size: 14.9268292683px;;">mathtype</a>
+</a><a href='http://www.zhenv5.com/?tag=urllib' class='tag-link-140' title='2 个话题' style="color:#34d1dc;font-size: 14.9268292683px;;">urllib</a>
+</a><a href='http://www.zhenv5.com/?tag=learning-to-rank' class='tag-link-164' title='2 个话题' style="color:#c2e961;font-size: 14.9268292683px;;">learning to rank</a>
+</a><a href='http://www.zhenv5.com/?tag=%e5%a4%9a%e6%a0%b8' class='tag-link-183' title='2 个话题' style="color:#ab812b;font-size: 14.9268292683px;;">多核</a>
+</a><a href='http://www.zhenv5.com/?tag=adarank' class='tag-link-114' title='2 个话题' style="color:#ac0f65;font-size: 14.9268292683px;;">Adarank</a>
+</a><a href='http://www.zhenv5.com/?tag=%e7%a5%9e%e7%bb%8f%e7%bd%91%e7%bb%9c' class='tag-link-418' title='2 个话题' style="color:#330a8e;font-size: 14.9268292683px;;">神经网络</a>
+</a><a href='http://www.zhenv5.com/?tag=%e7%94%b5%e5%bd%b1' class='tag-link-9' title='2 个话题' style="color:#2b3fd1;font-size: 14.9268292683px;;">电影</a>
+</a><a href='http://www.zhenv5.com/?tag=%e6%90%9c%e7%b4%a2' class='tag-link-213' title='2 个话题' style="color:#ca3b3a;font-size: 14.9268292683px;;">搜索</a>
+</a><a href='http://www.zhenv5.com/?tag=%e8%92%99%e7%89%b9%e5%8d%a1%e6%b4%9b' class='tag-link-368' title='2 个话题' style="color:#dd65e8;font-size: 14.9268292683px;;">蒙特卡洛</a>
+</a><a href='http://www.zhenv5.com/?tag=%e7%bb%9f%e8%ae%a1' class='tag-link-25' title='4 个话题' style="color:#19519b;font-size: 18.5040650407px;;">统计</a>
+</a><a href='http://www.zhenv5.com/?tag=centos' class='tag-link-321' title='3 个话题' style="color:#7cf868;font-size: 16.8780487805px;;">CentOs</a>
+</a><a href='http://www.zhenv5.com/?tag=matlab' class='tag-link-413' title='2 个话题' style="color:#793a81;font-size: 14.9268292683px;;">matlab</a>
+</a><a href='http://www.zhenv5.com/?tag=%e6%96%87%e7%ab%a0' class='tag-link-20' title='2 个话题' style="color:#b5bf1f;font-size: 14.9268292683px;;">文章</a>
+</a><a href='http://www.zhenv5.com/?tag=akismet' class='tag-link-184' title='2 个话题' style="color:#9ecf4b;font-size: 14.9268292683px;;">Akismet</a>
+</a><a href='http://www.zhenv5.com/?tag=%e6%a0%87%e7%ad%be' class='tag-link-18' title='3 个话题' style="color:#855e7f;font-size: 16.8780487805px;;">标签</a>
+</a><a href='http://www.zhenv5.com/?tag=listwise' class='tag-link-168' title='2 个话题' style="color:#9eb962;font-size: 14.9268292683px;;">ListWise</a>
+</a><a href='http://www.zhenv5.com/?tag=%e6%8f%92%e4%bb%b6' class='tag-link-23' title='7 个话题' style="color:#1db584;font-size: 21.756097561px;;">插件</a>
+</a><a href='http://www.zhenv5.com/?tag=%e6%b7%98%e5%ae%9d' class='tag-link-212' title='4 个话题' style="color:#64a23b;font-size: 18.5040650407px;;">淘宝</a>
+</a><a href='http://www.zhenv5.com/?tag=%e9%a6%99%e6%b8%af' class='tag-link-158' title='3 个话题' style="color:#1d9dde;font-size: 16.8780487805px;;">香港</a>
+</a><a href='http://www.zhenv5.com/?tag=%e4%bb%8a%e6%9c%9d%e6%9c%89%e9%85%92%e4%bb%8a%e6%9c%9d%e9%86%89%ef%bc%8c%e4%ba%ba%e9%97%b4%e6%ad%a3%e9%81%93%e6%98%af%e6%b2%a7%e6%a1%91' class='tag-link-405' title='2 个话题' style="color:#964f4b;font-size: 14.9268292683px;;">人生得意须尽欢</a>
+</a><a href='http://www.zhenv5.com/?tag=%e8%8b%b9%e6%9e%9c' class='tag-link-11' title='4 个话题' style="color:#ee9970;font-size: 18.5040650407px;;">苹果</a>
+</a><a href='http://www.zhenv5.com/?tag=ccir' class='tag-link-385' title='2 个话题' style="color:#c8e7e6;font-size: 14.9268292683px;;">CCIR</a>
+</a><a href='http://www.zhenv5.com/?tag=%e7%99%be%e5%ba%a6' class='tag-link-264' title='2 个话题' style="color:#c4a66e;font-size: 14.9268292683px;;">百度</a>
+</a><a href='http://www.zhenv5.com/?tag=%e5%88%97%e8%a1%a8' class='tag-link-281' title='2 个话题' style="color:#17bb59;font-size: 14.9268292683px;;">列表</a>
+</a><a href='http://www.zhenv5.com/?tag=%e5%ae%bf%e9%86%89' class='tag-link-16' title='2 个话题' style="color:#9ffef3;font-size: 14.9268292683px;;">宿醉</a>
+</a><a href='http://www.zhenv5.com/?tag=adsense' class='tag-link-56' title='2 个话题' style="color:#9d1378;font-size: 14.9268292683px;;">adsense</a>
+</a><a href='http://www.zhenv5.com/?tag=%e7%a7%91%e5%ad%a6%e5%ae%b6' class='tag-link-389' title='2 个话题' style="color:#3311af;font-size: 14.9268292683px;;">科学家</a>
+</a><a href='http://www.zhenv5.com/?tag=%e5%9b%9e%e5%bd%92' class='tag-link-205' title='2 个话题' style="color:#8742da;font-size: 14.9268292683px;;">回归</a>
+</a><a href='http://www.zhenv5.com/?tag=neural-network' class='tag-link-419' title='2 个话题' style="color:#1e2c98;font-size: 14.9268292683px;;">neural network</a>
+</a><a href='http://www.zhenv5.com/?tag=ubuntu' class='tag-link-110' title='4 个话题' style="color:#538517;font-size: 18.5040650407px;;">ubuntu</a>
+</a><a href='http://www.zhenv5.com/?tag=%e6%8e%92%e5%ba%8f' class='tag-link-214' title='2 个话题' style="color:#8b4aeb;font-size: 14.9268292683px;;">排序</a>
+</a><a href='http://www.zhenv5.com/?tag=%e8%80%81%e8%96%9b%e4%b8%bb%e6%9c%ba' class='tag-link-60' title='2 个话题' style="color:#32f44a;font-size: 14.9268292683px;;">老薛主机</a></div>
+<div class="widget">
+	<h3>史料记载</h3>		<ul>
+			<li><a href='http://www.zhenv5.com/?m=201205' title='2012 年五月'>2012 年五月</a>&nbsp;(3)</li>
+	<li><a href='http://www.zhenv5.com/?m=201204' title='2012 年四月'>2012 年四月</a>&nbsp;(2)</li>
+	<li><a href='http://www.zhenv5.com/?m=201203' title='2012 年三月'>2012 年三月</a>&nbsp;(3)</li>
+	<li><a href='http://www.zhenv5.com/?m=201202' title='2012 年二月'>2012 年二月</a>&nbsp;(2)</li>
+	<li><a href='http://www.zhenv5.com/?m=201201' title='2012 年一月'>2012 年一月</a>&nbsp;(3)</li>
+	<li><a href='http://www.zhenv5.com/?m=201112' title='2011 年十二月'>2011 年十二月</a>&nbsp;(7)</li>
+	<li><a href='http://www.zhenv5.com/?m=201111' title='2011 年十一月'>2011 年十一月</a>&nbsp;(8)</li>
+	<li><a href='http://www.zhenv5.com/?m=201110' title='2011 年十月'>2011 年十月</a>&nbsp;(11)</li>
+	<li><a href='http://www.zhenv5.com/?m=201109' title='2011 年九月'>2011 年九月</a>&nbsp;(15)</li>
+	<li><a href='http://www.zhenv5.com/?m=201108' title='2011 年八月'>2011 年八月</a>&nbsp;(37)</li>
+	<li><a href='http://www.zhenv5.com/?m=201107' title='2011 年七月'>2011 年七月</a>&nbsp;(23)</li>
+	<li><a href='http://www.zhenv5.com/?m=201106' title='2011 年六月'>2011 年六月</a>&nbsp;(15)</li>
+	<li><a href='http://www.zhenv5.com/?m=201105' title='2011 年五月'>2011 年五月</a>&nbsp;(8)</li>
+		</ul>
+</div>
+
+<div class="widget"><h3>博客统计</h3>
+   <ul>
+<li>日志总数：137 篇</li>
+<li>评论总数：330 篇</li>
+<li>标签数量：461 个</li>
+<li>链接总数：87 个</li>
+<li>建站日期：2011-05-29<br />
+<li>运行天数：356 天</li>
+<li>最后更新：2012-5-18</li>
+   </ul></div>
+
+
+<div class="widget">
+<form id="loginform" action="http://www.zhenv5.com/wp-login.php" method="post"><h3>用户登录</h3>
+<p>
+<label>用户名：<input class="login" type="text" name="log" id="log" value="" size="12" /></label>
+</p>
+<p>
+<label>密　码：<input class="login" type="password" name="pwd" id="pwd" value="" size="12" /></label>
+</p>
+<p>
+<input class="denglu" type="submit" name="submit" value="登陆" /> <label>记住我 <input id="comment_mail_notify" type="checkbox" name="rememberme" value="forever" /></label>
+</p>
+<p>
+<input type="hidden" name="redirect_to" value="/?p=958"/>
+</p>
+</form>
+</div>
+</div>
+</div>
+<div class="clear"></div>
+<div id="footer">Copyright &copy; 2011-2012 兰叶春葳蕤,桂华秋皎洁|大风堂. Powered by WordPress</a>.
+ Theme by <rel="external">Weisay</a>.
+  <script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F801ab8a0fda2f949baeb6a9c147ffbf4' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-23670906-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>.	 </div>
+ 
+<div id="takeMeUpContainer" style="display:none;right:5px;background-color:#f4602f"><span id="takeMeUp" style="color:#ffffff;">欲穷千里目 O(∩_∩)O</span></div><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+<p style="margin:0;padding:0;height:1px;overflow:hidden;">
+    <script type="text/javascript"><!--
+        var wumiiSitePrefix = "http://www.zhenv5.com";
+        var wumiiEnableCustomPos = false;
+        var wumiiParams = "&num=4&mode=3&displayInFeed=1&version=1.0.5.5&pf=WordPress3.3.2";
+    //--></script><script type="text/javascript" src="http://widget.wumii.com/ext/relatedItemsWidget.htm"></script><a href="http://www.wumii.com/widget/relatedItems.htm" style="border:0;"><img src="http://static.wumii.com/images/pixel.png" alt="无觅相关文章插件，快速提升流量" style="border:0;padding:0;margin:0;" /></a>
+</p></div>
+</body>
+</html>
