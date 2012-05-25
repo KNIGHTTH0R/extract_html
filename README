@@ -1,14 +1,14 @@
-1. 安装说明
- extract_html库需要安装两个python开源库，可使用easy_install安装:
+1. 瀹夎璇存槑
+ extract_html搴撻渶瑕佸畨瑁呬袱涓猵ython寮�婧愬簱锛屽彲浣跨敤easy_install瀹夎:
  easy_install beautifulsoup4
  easy_install html5lib
 
-2. 使用说明
- 1) 默认传入html文档编码都为utf8，extract_html不负责判定编码及转码
- 2) python版本2.7已测，对版本暂无要求
- 3) 异常、无法提取等情况下直接返回原html
+2. 浣跨敤璇存槑
+ 1) 榛樿浼犲叆html鏂囨。缂栫爜閮戒负utf8锛宔xtract_html涓嶈礋璐ｅ垽瀹氱紪鐮佸強杞爜
+ 2) python鐗堟湰2.7宸叉祴锛屽鐗堟湰鏆傛棤瑕佹眰
+ 3) 寮傚父銆佹棤娉曟彁鍙栫瓑鎯呭喌涓嬬洿鎺ヨ繑鍥炲師html
 
-3. 调用示例
+3. 璋冪敤绀轰緥
  import extract_html
 
  def read_html_doc():
