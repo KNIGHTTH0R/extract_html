@@ -1,3 +1,4 @@
+Author Wensong He (snowhws@126.com)
 1. 安装说明
  extract_html库需要安装两个python开源库，可使用easy_install安装:
  easy_install beautifulsoup4
