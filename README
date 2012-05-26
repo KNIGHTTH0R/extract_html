@@ -12,6 +12,10 @@
 	if 0:
 		# Enable to support locale aware default string encodings.
     将此处的0改为1即可
+ 3) 解析不正确的情况
+	当前算法被称为“递归最重要”，重要的衡量方式为文字密度。
+	所以如果发现解析出来的不是想要的结果，那么说明该html中的正文比例是偏低的，当前版本的extract_html还无法解析正确。
+	以图片为主的网页，以及部分评论文字大于正文的网页存在此类问题。
 
 3. 调用示例
 from extract_html import ExtractHtml
