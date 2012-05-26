@@ -44,7 +44,7 @@ class ExtractHtml:
             return False
         self.__extract_stop_tag()
         try:
-            self.__result_dict["title"]=self.__soup.title.next_element.encode(self.__coding)
+            self.__result_dict["title"]=str(self.__soup.title.next_element.encode(self.__coding)).rstrip().strip()
             self.__result_dict["content"]=self.__soup.body.encode(self.__coding)
         except Exception,e:
             if __DEBUG_OUTPUT__:
