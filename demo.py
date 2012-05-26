@@ -11,12 +11,31 @@ def read_html_doc():
 def run():
     global res_dict
     html_doc=read_html_doc()
-    ex_html=ExtractHtml(html_doc)
-    res_dict=ex_html.GetResultDict()
+    DEBUG=True
+    ex_html=ExtractHtml(html_doc, DEBUG)    #using ExtractHtml Lib with two parameters:
+                                            #'html_doc' -  The coding must be utf8
+                                            #'DEBUG'    -  It's not nessary, the default value is False, when it is True,
+                                            #              the lib would output exception information to sys.stderr
+    res_dict=ex_html.GetResultDict()        #get result, the result is dict type, three keys in it:
+                                            #   keys :
+                                            #        1. 'STATE'   - Is exctracting successful or not
+                                            #                       'True' means extracting successful
+                                            #                       'False' means extracting failure, would give the 'body' to 'content'
+                                            #        2. 'title'   - Html title
+                                            #                       Now it just return the string in title tag
+                                            #                       Try it best to return some strings, but sometimes would return empty
+                                            #        3. 'content' - Html content
+                                            #                       Not very good for image type html, it's very good for text type html
+                                            #                       Coding with utf8
+                                            #                       Try it best to return some strings, but sometimes would return empty
 
 def output():
-    print res_dict["extract_successful"]
-    print res_dict["real_title"]
+    print res_dict["STATE"]
+    #print unicode(res_dict["title"])
+    fw=open("result.html","w")
+    fw.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">")
+    fw.write(res_dict["content"])
+    fw.close()
 
 read_html_doc()
 run()
