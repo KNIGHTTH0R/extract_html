@@ -6,6 +6,7 @@ __DEBUG_OUTPUT__=False
 HTML_STOP_TAG={"textarea":1,"iframe":1,"script":1,"input":1,"style":1}
 HTML_CONTENT_TAG={"div":1,"article":1}
 HTML_COMMENTS_TAG={"li":1,"ul":1,"ol":1,"dl":1}
+HTML_P_TAG="p"
 
 class ExtractHtml:
     def __init__(self, doc , DEBUG=False):
@@ -23,16 +24,64 @@ class ExtractHtml:
         if self.__beautifulsoup(doc):
             self.__run_extractor()
 
+    def __is_empty_tag(self,tag,special_name=""):
+        if isinstance(tag,NavigableString):
+            if len(tag.rstrip().strip())==0:
+                return True
+            else:
+                return False
+        state=False
+        if self.__has_children(tag):
+            if len(tag.contents)==0:
+                state=True
+            if len(tag.contents)==1:
+                if isinstance(tag.contents[0],NavigableString):
+                    if len(tag.contents[0].rstrip().strip())==0:
+                        state=True
+        if special_name!="":
+            if tag.name!=special_name:
+                state=False
+        return state
+
+    def __head_tail_normalization(self,content_tag):
+        if self.__has_children(content_tag):
+            children=content_tag.contents
+            lens=len(children)
+            extract_candidates=[]
+            if lens>0:
+                for i in range(0,lens):
+                    if self.__is_empty_tag(children[i],HTML_P_TAG):
+                        extract_candidates.append(children[i])
+                    else:
+                        break
+                i=lens-1
+                while i>=0:
+                    if self.__is_empty_tag(children[i],HTML_P_TAG):
+                        extract_candidates.append(children[i])
+                    else:
+                        break
+                    i-=1
+                for tag in extract_candidates:
+                    tag.extract()
+                        
     def __extract_stop_tag(self):
         all_tags=list(self.__soup.descendants)
+        parent_list=[]
         for tag in all_tags:
             if isinstance(tag,Comment):
+                parent_list.append(tag.parent)
                 tag.extract()
             elif isinstance(tag, NavigableString):
                 continue
             else:
                 if tag.name in HTML_STOP_TAG:
+                    parent_list.append(tag.parent)
                     tag.extract()
+        for parent in parent_list:
+            if parent==None:
+                continue
+            if self.__is_empty_tag(parent):
+                parent.extract()
 
     def __beautifulsoup(self,doc):
         '''using beautifulsoup parser the html doc'''
@@ -52,7 +101,7 @@ class ExtractHtml:
             #return False
         return True
 
-    def __has_chidren(self,tag):
+    def __has_children(self,tag):
         try:
             tag.children
             return True
@@ -62,7 +111,7 @@ class ExtractHtml:
     def __is_comment_tag(self,parent):
         if isinstance(parent, NavigableString):
             return False
-        if not self.__has_chidren(parent):
+        if not self.__has_children(parent):
             return False
         tag_count=0.0
         cm_count=0.0
@@ -77,7 +126,7 @@ class ExtractHtml:
 
     def __recursion_get_most_important_child_block(self, parent):
         content_tag=parent
-        if not self.__has_chidren(parent):
+        if not self.__has_children(parent):
             return content_tag
         parent_len=float(len(parent.get_text()))
         if parent_len<=0:
@@ -105,7 +154,7 @@ class ExtractHtml:
         if imp_len/parent_len>=self.__density:
             return self.__recursion_get_most_important_child_block(imp_tag)
         return (content_tag, comment_tag)
-
+    
     def __run_extractor(self):
         (content_tag, comment_tag)=(None,None)
         try:
@@ -119,6 +168,7 @@ class ExtractHtml:
             if comment_tag!=None:
                 self.__result_dict["comment"]=unicode(comment_tag).encode(self.__coding,"ignore")
                 comment_tag.extract()
+            self.__head_tail_normalization(content_tag)
             self.__result_dict["content"]=unicode(content_tag).encode(self.__coding,"ignore")
         
     def GetResultDict(self):
