@@ -4,9 +4,13 @@ from bs4 import BeautifulSoup,Comment,NavigableString
 
 __DEBUG_OUTPUT__=False
 HTML_STOP_TAG={"textarea":1,"iframe":1,"script":1,"input":1,"style":1}
+HTML_NORMAL_TAG={"center":1}
 HTML_CONTENT_TAG={"div":1,"article":1}
-HTML_COMMENTS_TAG={"li":1,"ul":1,"ol":1,"dl":1}
-HTML_P_TAG="p"
+HTML_COMMENTS_PARENT_TAG={"ul":1,"ol":1,"dl":1}
+HTML_COMMENTS_CHILD_TAG={"li":1,"dt":1,"dt":1}
+HTML_DIV_COMMENTS_TAG_STR="div"
+HTML_P_TAG_STR="p"
+HTML_USER_TYPE_TAG_PREFIX="data-"
 
 class ExtractHtml:
     def __init__(self, doc , DEBUG=False):
@@ -17,11 +21,15 @@ class ExtractHtml:
         __DEBUG_OUTPUT__=DEBUG
         self.__result_dict={"STATE":"False","title":"","content":"","comment":""}
         self.__density=0.5
+        self.__comments_density=0.8
         self.__coding="utf8"
         self.__parser="html5lib"        
         self.__soup=None
         
         if self.__beautifulsoup(doc):
+            fw=open("1.txt","w")
+            fw.write(self.__soup.prettify("utf8"))
+            fw.close()
             self.__run_extractor()
 
     def __is_empty_tag(self,tag,special_name=""):
@@ -50,13 +58,13 @@ class ExtractHtml:
             extract_candidates=[]
             if lens>0:
                 for i in range(0,lens):
-                    if self.__is_empty_tag(children[i],HTML_P_TAG):
+                    if self.__is_empty_tag(children[i],HTML_P_TAG_STR):
                         extract_candidates.append(children[i])
                     else:
                         break
                 i=lens-1
                 while i>=0:
-                    if self.__is_empty_tag(children[i],HTML_P_TAG):
+                    if self.__is_empty_tag(children[i],HTML_P_TAG_STR):
                         extract_candidates.append(children[i])
                     else:
                         break
@@ -108,19 +116,42 @@ class ExtractHtml:
         except:
             return False
 
+    def __attrs_is_equal(self,attrs1,attrs2):
+        if len(attrs1)!=len(attrs2):
+            return False
+        _equal=True
+        for key in attrs1:
+            if key not in attrs2:
+                return False
+            if not key.startswith(HTML_USER_TYPE_TAG_PREFIX):
+                if attrs1[key]!=attrs2[key]:
+                    return False
+        return True
+
     def __is_comment_tag(self,parent):
         if isinstance(parent, NavigableString):
             return False
         if not self.__has_children(parent):
             return False
+        if parent.name in HTML_COMMENTS_PARENT_TAG:
+            return True
         tag_count=0.0
-        cm_count=0.0
+        list_count=0.0
+        div_cm_count=0.0
+        div_cm_attrs=None
         for child in parent.children:
             if not isinstance(child, NavigableString):
-                if child.name in HTML_COMMENTS_TAG:
-                    cm_count+=1.0
+                if child.name==HTML_DIV_COMMENTS_TAG_STR:
+                    if div_cm_attrs==None:
+                        div_cm_attrs=child.attrs
+                    elif self.__attrs_is_equal(div_cm_attrs,child.attrs):
+                        div_cm_count+=1.0
+                elif child.name in HTML_COMMENTS_PARENT_TAG:
+                    list_count+=1.0
             tag_count+=1.0
-        if cm_count/tag_count>=self.__density:
+        if (list_count/tag_count)>=self.__density:
+            return True
+        if (div_cm_count/tag_count)>=self.__comments_density:
             return True
         return False
 
@@ -139,10 +170,10 @@ class ExtractHtml:
             child_len=0.0
             if isinstance(child, NavigableString):
                 continue
-            if child.name in HTML_COMMENTS_TAG:
+            if child.name in HTML_COMMENTS_CHILD_TAG:#skip, just handle upper floor
                 continue
-            elif child.name in HTML_CONTENT_TAG:
-                child_len=float(len(child.get_text()))
+            elif child.name in HTML_CONTENT_TAG or child.name in HTML_NORMAL_TAG:
+                child_len=float(len(unicode(child.get_text().replace(" ","")).encode("gbk","ignore")))
             if child_len>imp_len:
                 if self.__is_comment_tag(child):
                     if child_len>comments_len:
