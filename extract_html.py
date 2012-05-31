@@ -19,7 +19,7 @@ class ExtractHtml:
         '''@doc : original html document(coding utf8)'''
         '''@return : class itself'''
         __DEBUG_OUTPUT__=DEBUG
-        self.__result_dict={"STATE":"False","title":"","content":"","comment":""}
+        self.__result_dict={"STATE":"False","title":"","content":"","comment":"","summary":""}
         self.__density=0.5
         self.__comments_density=0.8
         self.__coding="utf8"
@@ -28,7 +28,7 @@ class ExtractHtml:
         
         if self.__beautifulsoup(doc):
             fw=open("1.txt","w")
-            fw.write(self.__soup.prettify("utf8"))
+            #fw.write(self.__soup.prettify("utf8"))
             fw.close()
             self.__run_extractor()
 
@@ -173,7 +173,7 @@ class ExtractHtml:
             if child.name in HTML_COMMENTS_CHILD_TAG:#skip, just handle upper floor
                 continue
             elif child.name in HTML_CONTENT_TAG or child.name in HTML_NORMAL_TAG:
-                child_len=float(len(unicode(child.get_text().replace(" ","")).encode("gbk","ignore")))
+                child_len=float(len(unicode(child.get_text().replace(" ","").encode("gbk","ignore"))))
             if child_len>imp_len:
                 if self.__is_comment_tag(child):
                     if child_len>comments_len:
@@ -185,6 +185,12 @@ class ExtractHtml:
         if imp_len/parent_len>=self.__density:
             return self.__recursion_get_most_important_child_block(imp_tag)
         return (content_tag, comment_tag)
+
+    def __get_summary(self,content_tag):
+        try:
+            self.__result_dict["summary"]=unicode(content_tag.get_text()[:40]).encode(self.__coding,"ignore")
+        except:
+            pass
     
     def __run_extractor(self):
         (content_tag, comment_tag)=(None,None)
@@ -196,11 +202,13 @@ class ExtractHtml:
             return
         if content_tag!=self.__soup.body:
             self.__result_dict["STATE"]="True"
+            self.__get_summary(content_tag)
             if comment_tag!=None:
                 self.__result_dict["comment"]=unicode(comment_tag).encode(self.__coding,"ignore")
                 comment_tag.extract()
             self.__head_tail_normalization(content_tag)
             self.__result_dict["content"]=unicode(content_tag).encode(self.__coding,"ignore")
+            
         
     def GetResultDict(self):
         return self.__result_dict
