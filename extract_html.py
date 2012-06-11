@@ -3,10 +3,10 @@ import sys
 from bs4 import BeautifulSoup,Comment,NavigableString,CData
 
 __DEBUG_OUTPUT__=False
+SELF_TAG_NAME="_P"
 HTML_STOP_TAG={"textarea":1,"iframe":1,"script":1,"input":1,"style":1}
 HTML_H_TAG={"h1":0,"h2":0,"h3":0,"h4":0,"h5":0,"h6":0}
-HTML_CONTENT_SUBTAG={"p":1,"br":1,"b":1,"strong":1,"hr":1,"pre":1,"blockquote":1}
-
+HTML_CONTENT_SUBTAG={"p":1,"br":1,"b":1,"strong":1,"hr":1,"pre":1,"blockquote":1,SELF_TAG_NAME:1}
 
 class ExtractHtml:
     def __init__(self, doc , DEBUG=False):
@@ -102,7 +102,45 @@ class ExtractHtml:
                 break
             pwinner_tag=pwinner_tag.parent
         return pwinner_tag
-        
+
+    def __add_to_pdict(self,tag,candidate,ptag_candidate_dict):
+        if candidate.name not in HTML_CONTENT_SUBTAG and tag.name=="p":
+            if str(candidate.attrs) not in ptag_candidate_dict:
+                cands_list=[]
+                cands_list.append([candidate,1])
+                ptag_candidate_dict[str(candidate.attrs)]=cands_list
+            else:
+                cand_list=ptag_candidate_dict[str(candidate.attrs)]
+                lens=len(cand_list)
+                _find=False
+                for index in range(0,lens):
+                    if cand_list[index][0]==candidate:
+                        cand_list[index][1]+=1
+                        _find=True
+                        break
+                if not _find:
+                    ptag_candidate_dict[str(candidate.attrs)].append([candidate,1])
+
+    def __add_to_cdict(self,candidate,content_candidate_dict,text_len):
+        cand_num=text_len
+        if str(candidate.attrs) not in content_candidate_dict:
+            cands_list=[]
+            cands_list.append([candidate,text_len])
+            content_candidate_dict[str(candidate.attrs)]=cands_list
+        else:
+            cand_list=content_candidate_dict[str(candidate.attrs)]
+            lens=len(cand_list)
+            _find=False
+            for index in range(0,lens):
+                if cand_list[index][0]==candidate:
+                    cand_list[index][1]+=text_len
+                    cand_num=cand_list[index][1]
+                    _find=True
+                    break
+            if not _find:
+                content_candidate_dict[str(candidate.attrs)].append([candidate,text_len])
+        return cand_num
+                
     def __vote_to_content_tag(self):
         content_candidate_dict={}
         ptag_candidate_dict={}
@@ -114,48 +152,19 @@ class ExtractHtml:
             candis=list(self.__soup.body.find_all(content_tag_name))
             for tag in candis:
                 candidate=tag.parent
-                if candidate.name not in HTML_CONTENT_SUBTAG and tag.name=="p":
-                    if str(candidate.attrs) not in ptag_candidate_dict:
-                        cands_list=[]
-                        cands_list.append([candidate,1])
-                        ptag_candidate_dict[str(candidate.attrs)]=cands_list
-                    else:
-                        cand_list=ptag_candidate_dict[str(candidate.attrs)]
-                        lens=len(cand_list)
-                        _find=False
-                        for index in range(0,lens):
-                            if cand_list[index][0]==candidate:
-                                cand_list[index][1]+=1
-                                _find=True
-                                break
-                        if not _find:
-                            ptag_candidate_dict[str(candidate.attrs)].append([candidate,1])
+                self.__add_to_pdict(tag,candidate,ptag_candidate_dict)
                 try:
                     while candidate.name in HTML_CONTENT_SUBTAG:
                         candidate=candidate.parent
                 except:
                     pass
                 text_len=len(unicode(tag.get_text().replace(" ","").rstrip().strip()).encode("gbk","ignore"))
-                cand_num=text_len
-                if str(candidate.attrs) not in content_candidate_dict:
-                    cands_list=[]
-                    cands_list.append([candidate,text_len])
-                    content_candidate_dict[str(candidate.attrs)]=cands_list
-                else:
-                    cand_list=content_candidate_dict[str(candidate.attrs)]
-                    lens=len(cand_list)
-                    _find=False
-                    for index in range(0,lens):
-                        if cand_list[index][0]==candidate:
-                            cand_list[index][1]+=text_len
-                            cand_num=cand_list[index][1]
-                            _find=True
-                            break
-                    if not _find:
-                        content_candidate_dict[str(candidate.attrs)].append([candidate,text_len])
+                cand_num=self.__add_to_cdict(candidate,content_candidate_dict,text_len)
                 if cand_num>winner_num:
                     winner_tag=candidate
                     winner_num=cand_num
+                if tag.name==SELF_TAG_NAME:
+                    tag.unwrap()
         return self.__judgement_winner(winner_tag,ptag_candidate_dict)
     
     def __extract_stop_tag(self, content_tag):
@@ -166,6 +175,8 @@ class ExtractHtml:
                 parent_list.append(tag.parent)
                 tag.extract()
             elif isinstance(tag, NavigableString):
+                if tag.parent.name=="div" and tag.replace(" ","").rstrip().strip()!="":
+                    tag.wrap(self.__soup.new_tag(SELF_TAG_NAME))
                 continue
             else:
                 if tag.name in HTML_STOP_TAG:
