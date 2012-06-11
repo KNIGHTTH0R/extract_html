@@ -19,7 +19,6 @@ class ExtractHtml:
         self.__coding="utf8"
         self.__parser="html5lib"
         self.__density=0.5
-        self.__content_density=0.5
         self.__soup=None
         self.__H_TAG_MAX_NUM=5
         
@@ -75,6 +74,8 @@ class ExtractHtml:
     def __judgement_parent(self,child,parent):
         if child==parent:
             return True
+        if child.parent==None:
+            return False
         if child.parent==self.__soup.body:
             return False
         return self.__judgement_parent(child.parent,parent)
@@ -105,6 +106,10 @@ class ExtractHtml:
 
     def __add_to_pdict(self,tag,candidate,ptag_candidate_dict):
         if candidate.name not in HTML_CONTENT_SUBTAG and tag.name=="p":
+            text_len=len(unicode(tag.get_text().replace(" ","").rstrip().strip()).encode("gbk","ignore"))
+            char_len=len(unicode(tag).rstrip().strip().replace(" ","").encode("gbk","ignore"))
+            if float(text_len)/char_len < self.__density:
+                return
             if str(candidate.attrs) not in ptag_candidate_dict:
                 cands_list=[]
                 cands_list.append([candidate,1])
@@ -175,7 +180,8 @@ class ExtractHtml:
                 parent_list.append(tag.parent)
                 tag.extract()
             elif isinstance(tag, NavigableString):
-                if tag.parent.name=="div" and tag.replace(" ","").rstrip().strip()!="":
+                if tag.parent.name=="div" and tag.replace(" ","").rstrip().strip()!="" and \
+                   (len(list(tag.previous_siblings))+len(list(tag.next_siblings)))>0:
                     tag.wrap(self.__soup.new_tag(SELF_TAG_NAME))
                 continue
             else:
@@ -187,6 +193,10 @@ class ExtractHtml:
                 continue
             if self.__is_empty_tag(parent):
                 parent.extract()
+        #fw=open("test.html","w")
+        #fw.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">")
+        #fw.write(unicode(self.__soup.body).encode("utf8"))
+        #fw.close()
 
     def __beautifulsoup(self,doc):
         '''using beautifulsoup parser the html doc'''
