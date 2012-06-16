@@ -1,12 +1,20 @@
 import string
 import sys
 from bs4 import BeautifulSoup,Comment,NavigableString,CData
+import edit_dist
 
 __DEBUG_OUTPUT__=False
+#page_type
+PAGE_TYPE_ARTICLE="ARTICLE"
+PAGE_TYPE_MEDIA="MEDIA"
+#article
 SELF_TAG_NAME="_P"
 HTML_STOP_TAG={"textarea":1,"iframe":1,"script":1,"input":1,"style":1}
 HTML_H_TAG={"h1":0,"h2":0,"h3":0,"h4":0,"h5":0,"h6":0}
 HTML_CONTENT_SUBTAG={"p":1,"br":1,"b":1,"strong":1,"hr":1,"pre":1,"blockquote":1,SELF_TAG_NAME:1}
+HTML_TITLE_TAG={"span":1,"a":1,"div":1,"h1":1,"h2":1,"h3":1,"h4":1,"h5":1,"h6":1}
+#media
+HTML_MEDIA_TAG={"object":1,"vedio":1,"embed":1,"audio":1,"video":1}
 
 class ExtractHtml:
     def __init__(self, doc , DEBUG=False):
@@ -146,7 +154,7 @@ class ExtractHtml:
                 content_candidate_dict[str(candidate.attrs)].append([candidate,text_len])
         return cand_num
                 
-    def __vote_to_content_tag(self):
+    def __vote_to_article_content_tag(self):
         content_candidate_dict={}
         ptag_candidate_dict={}
         winner_tag=None
@@ -171,8 +179,41 @@ class ExtractHtml:
                 if tag.name==SELF_TAG_NAME:
                     tag.unwrap()
         return self.__judgement_winner(winner_tag,ptag_candidate_dict)
+
+    def __vote_to_media_content_tag(self):
+        content_candidate_dict={}
+        winner_tag=None
+        winner_num=0
+        for content_tag_name in HTML_MEDIA_TAG:
+            candis=list(self.__soup.body.find_all(content_tag_name))
+            for tag in candis:
+                candidate=tag.parent
+                cand_num=0
+                if str(candidate.attrs) not in content_candidate_dict:
+                    cand_list=[]
+                    cand_list.append((candidate,1))
+                    content_candidate_dict[str(candidate.attrs)]=cand_list
+                    cand_num=1
+                else:
+                    index=0
+                    for cand,num in content_candidate_dict[str(candidate.attrs)]:
+                        if candidate==cand:
+                            content_candidate_dict[str(candidate.attrs)][index][1]+=1
+                            cand_num=content_candidate_dict[str(candidate.attrs)][index][1]
+                            break
+                        index+=1
+                if cand_num>winner_num:
+                    winner_tag=candidate
+                    winner_num=cand_num
+        return winner_tag
+
+    def __wrap_self_tag(self,tag):
+        if tag.parent.name=="div" and tag.replace(" ","").rstrip().strip()!="" and \
+                   (len(list(tag.previous_siblings))+len(list(tag.next_siblings)))>0:
+            tag.wrap(self.__soup.new_tag(SELF_TAG_NAME))
     
-    def __extract_stop_tag(self, content_tag):
+    def __iterator_tags(self, content_tag):
+        page_type=PAGE_TYPE_ARTICLE
         all_tags=list(content_tag.descendants)
         parent_list=[]
         for tag in all_tags:
@@ -180,10 +221,9 @@ class ExtractHtml:
                 parent_list.append(tag.parent)
                 tag.extract()
             elif isinstance(tag, NavigableString):
-                if tag.parent.name=="div" and tag.replace(" ","").rstrip().strip()!="" and \
-                   (len(list(tag.previous_siblings))+len(list(tag.next_siblings)))>0:
-                    tag.wrap(self.__soup.new_tag(SELF_TAG_NAME))
                 continue
+            elif tag.name in HTML_MEDIA_TAG:
+                page_type=PAGE_TYPE_MEDIA
             else:
                 if tag.name in HTML_STOP_TAG:
                     parent_list.append(tag.parent)
@@ -193,10 +233,27 @@ class ExtractHtml:
                 continue
             if self.__is_empty_tag(parent):
                 parent.extract()
+        return page_type
         #fw=open("test.html","w")
         #fw.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">")
         #fw.write(unicode(self.__soup.body).encode("utf8"))
         #fw.close()
+
+    def __get_real_title(self,content_tag):
+        _ed=edit_dist.EditDist()
+        all_tags=list(content_tag.descendants)
+        min_dist=len(unicode(self.__soup.title.next_element))
+        best_title=""
+        for tag in all_tags:
+            if isinstance(tag,NavigableString):
+                continue
+            if tag.name not in HTML_TITLE_TAG:
+                continue
+            dist=_ed.elimination_dist(unicode(self.__soup.title.next_element),unicode(tag.get_text()))
+            if dist<min_dist:
+                min_dist=dist
+                best_title=unicode(tag.get_text()).encode(self.__coding,"ignore").rstrip().strip()
+        return best_title
 
     def __beautifulsoup(self,doc):
         '''using beautifulsoup parser the html doc'''
@@ -216,14 +273,23 @@ class ExtractHtml:
         except Exception,e:
             if __DEBUG_OUTPUT__:
                 print >> sys.stderr,"Error: when __beautifulsoup2 - ",e
-        self.__extract_stop_tag(self.__soup.body)
-        (content_tag,succ)=(None,False)
-        content_tag=self.__vote_to_content_tag()
+        page_type=self.__iterator_tags(self.__soup.body)
+        content_tag=None
+        if page_type==PAGE_TYPE_ARTICLE:
+            content_tag=self.__vote_to_article_content_tag()
+        elif page_type==PAGE_TYPE_MEDIA:
+            content_tag=self.__vote_to_media_content_tag()
         if content_tag==None:
             return False
+        best_title=self.__get_real_title(self.__soup.body)
+        if best_title!="":
+            self.__result_dict["title"]=best_title
+        else:
+            print 0
         if self.__has_children(content_tag):
-            self.__head_tail_normalization(content_tag)
-            self.__get_summary(content_tag)
+            if page_type==PAGE_TYPE_ARTICLE:
+                self.__head_tail_normalization(content_tag)
+                self.__get_summary(content_tag)
             self.__result_dict["STATE"]="True"
             self.__result_dict["content"]=unicode(content_tag).encode(self.__coding,"ignore")
         return True
