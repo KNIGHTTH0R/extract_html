@@ -275,10 +275,10 @@ class ExtractHtml:
                 print >> sys.stderr,"Error: when __beautifulsoup2 - ",e
         page_type=self.__iterator_tags(self.__soup.body)
         content_tag=None
-        if page_type==PAGE_TYPE_ARTICLE:
-            content_tag=self.__vote_to_article_content_tag()
-        elif page_type==PAGE_TYPE_MEDIA:
-            content_tag=self.__vote_to_media_content_tag()
+        #if page_type==PAGE_TYPE_ARTICLE:
+        content_tag=self.__vote_to_article_content_tag()
+        #elif page_type==PAGE_TYPE_MEDIA:
+        #    content_tag=self.__vote_to_media_content_tag()
         if content_tag==None:
             return False
         best_title=self.__get_real_title(self.__soup.body)
