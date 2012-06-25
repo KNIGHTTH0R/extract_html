@@ -180,38 +180,11 @@ class ExtractHtml:
                     tag.unwrap()
         return self.__judgement_winner(winner_tag,ptag_candidate_dict)
 
-    def __vote_to_media_content_tag(self):
-        content_candidate_dict={}
-        winner_tag=None
-        winner_num=0
-        for content_tag_name in HTML_MEDIA_TAG:
-            candis=list(self.__soup.body.find_all(content_tag_name))
-            for tag in candis:
-                candidate=tag.parent
-                cand_num=0
-                if str(candidate.attrs) not in content_candidate_dict:
-                    cand_list=[]
-                    cand_list.append((candidate,1))
-                    content_candidate_dict[str(candidate.attrs)]=cand_list
-                    cand_num=1
-                else:
-                    index=0
-                    for cand,num in content_candidate_dict[str(candidate.attrs)]:
-                        if candidate==cand:
-                            content_candidate_dict[str(candidate.attrs)][index][1]+=1
-                            cand_num=content_candidate_dict[str(candidate.attrs)][index][1]
-                            break
-                        index+=1
-                if cand_num>winner_num:
-                    winner_tag=candidate
-                    winner_num=cand_num
-        return winner_tag
-
     def __wrap_self_tag(self,tag):
         if tag.parent.name=="div" and tag.replace(" ","").rstrip().strip()!="" and \
                    (len(list(tag.previous_siblings))+len(list(tag.next_siblings)))>0:
             tag.wrap(self.__soup.new_tag(SELF_TAG_NAME))
-    
+                  
     def __iterator_tags(self, content_tag):
         page_type=PAGE_TYPE_ARTICLE
         all_tags=list(content_tag.descendants)
@@ -221,6 +194,7 @@ class ExtractHtml:
                 parent_list.append(tag.parent)
                 tag.extract()
             elif isinstance(tag, NavigableString):
+                self.__wrap_self_tag(tag)
                 continue
             elif tag.name in HTML_MEDIA_TAG:
                 page_type=PAGE_TYPE_MEDIA
@@ -233,12 +207,12 @@ class ExtractHtml:
                 continue
             if self.__is_empty_tag(parent):
                 parent.extract()
-        return page_type
         #fw=open("test.html","w")
         #fw.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">")
         #fw.write(unicode(self.__soup.body).encode("utf8"))
         #fw.close()
-
+        return page_type
+        
     def __get_real_title(self,content_tag):
         _ed=edit_dist.EditDist()
         all_tags=list(content_tag.descendants)
@@ -274,18 +248,12 @@ class ExtractHtml:
             if __DEBUG_OUTPUT__:
                 print >> sys.stderr,"Error: when __beautifulsoup2 - ",e
         page_type=self.__iterator_tags(self.__soup.body)
-        content_tag=None
-        #if page_type==PAGE_TYPE_ARTICLE:
         content_tag=self.__vote_to_article_content_tag()
-        #elif page_type==PAGE_TYPE_MEDIA:
-        #    content_tag=self.__vote_to_media_content_tag()
         if content_tag==None:
             return False
         best_title=self.__get_real_title(self.__soup.body)
         if best_title!="":
             self.__result_dict["title"]=best_title
-        else:
-            print 0
         if self.__has_children(content_tag):
             if page_type==PAGE_TYPE_ARTICLE:
                 self.__head_tail_normalization(content_tag)
