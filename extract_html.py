@@ -2,6 +2,7 @@ import string
 import sys
 from bs4 import BeautifulSoup,Comment,NavigableString,CData
 import edit_dist
+import hashlib
 
 __DEBUG_OUTPUT__=False
 #page_type
@@ -15,6 +16,9 @@ HTML_CONTENT_SUBTAG={"p":1,"br":1,"b":1,"strong":1,"hr":1,"pre":1,"blockquote":1
 HTML_TITLE_TAG={"span":1,"a":1,"div":1,"h1":1,"h2":1,"h3":1,"h4":1,"h5":1,"h6":1}
 #media
 HTML_MEDIA_TAG={"object":1,"vedio":1,"embed":1,"audio":1,"video":1}
+#id_Map
+TAGS_ID_MAP={}
+WINNER_TAG_ID=-1
 
 class ExtractHtml:
     def __init__(self, doc , DEBUG=False):
@@ -155,6 +159,7 @@ class ExtractHtml:
         return cand_num
                 
     def __vote_to_article_content_tag(self):
+        global WINNER_TAG_ID
         content_candidate_dict={}
         ptag_candidate_dict={}
         winner_tag=None
@@ -178,18 +183,25 @@ class ExtractHtml:
                     winner_num=cand_num
                 if tag.name==SELF_TAG_NAME:
                     tag.unwrap()
+        WINNER_TAG_ID=TAGS_ID_MAP[self.__get_tag_sign(winner_tag)]
         return self.__judgement_winner(winner_tag,ptag_candidate_dict)
 
     def __wrap_self_tag(self,tag):
         if tag.parent.name=="div" and tag.replace(" ","").rstrip().strip()!="" and \
                    (len(list(tag.previous_siblings))+len(list(tag.next_siblings)))>0:
             tag.wrap(self.__soup.new_tag(SELF_TAG_NAME))
+
+    def __get_tag_sign(self,tag):
+        return hashlib.md5(unicode(tag).encode(self.__coding,"ignore")).hexdigest().upper()
                   
     def __iterator_tags(self, content_tag):
         page_type=PAGE_TYPE_ARTICLE
         all_tags=list(content_tag.descendants)
         parent_list=[]
+        index=0
         for tag in all_tags:
+            TAGS_ID_MAP[self.__get_tag_sign(tag)]=index
+            index+=1
             if isinstance(tag,Comment) or isinstance(tag,CData):
                 parent_list.append(tag.parent)
                 tag.extract()
@@ -225,8 +237,9 @@ class ExtractHtml:
                 continue
             dist=_ed.elimination_dist(unicode(self.__soup.title.next_element),unicode(tag.get_text()))
             if dist<min_dist:
-                min_dist=dist
-                best_title=unicode(tag.get_text()).encode(self.__coding,"ignore").rstrip().strip()
+                if WINNER_TAG_ID>TAGS_ID_MAP[self.__get_tag_sign(tag)]:
+                    min_dist=dist
+                    best_title=unicode(tag.get_text()).encode(self.__coding,"ignore").rstrip().strip()
         return best_title
 
     def __beautifulsoup(self,doc):
