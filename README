@@ -13,9 +13,6 @@ Author Wensong He (snowhws@126.com)
 	if 0:
 		# Enable to support locale aware default string encodings.
     将此处的0改为1即可
- 3) 解析不正确的情况
-	当前算法被称为“投票算法”，效果比递归最重要要好很多。
-	使用<p>等内容标记作为可投票者，若内容不在这些标记内，提取不太完美，还需要改进。
 
 3. 调用示例
 from extract_html import ExtractHtml
